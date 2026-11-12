@@ -1,0 +1,307 @@
+﻿@model Evently.ViewModels.Organizer.OrganizerDashboardViewModel
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Organizer Dashboard - Overview";
+    Layout = "_DashboardLayout";
+}
+
+<div class="flex flex-col w-full">
+    <!-- Top Command & Executive Narrative Header -->
+    <section class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg mb-space-xl">
+        <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-space-xs font-label-caps text-label-caps uppercase text-outline mb-space-xs">
+                <span>Workspace</span>
+                <span class="text-outline-variant">/</span>
+                <span class="text-primary">Overview</span>
+                <span class="text-outline-variant">•</span>
+                <span class="text-tertiary">South Africa Operations</span>
+            </div>
+            <div class="flex items-center gap-space-sm">
+                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Good morning, @Model.OrganizerName.</h1>
+                @if (Model.IsVerified)
+                {
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-container text-on-primary-container font-label-caps text-label-caps uppercase">
+                        <span class="material-symbols-outlined text-[14px]">verified</span> Verified
+                    </span>
+                }
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-2xl">
+                Here is what is happening across your @Model.TotalEvents total events (@Model.UpcomingEventsCount upcoming) today. Escrow settlement cycle clears at 18:00 SAST.
+            </p>
+        </div>
+        
+        <!-- Quick Action Toolbelt -->
+        <div class="flex flex-wrap items-center gap-space-sm self-start lg:self-auto">
+            <div class="flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-surface-container text-on-surface text-label-lg font-label-lg shadow-sm">
+                <span class="material-symbols-outlined text-[18px] text-primary">calendar_month</span>
+                <span>Last 30 Days</span>
+                <span class="material-symbols-outlined text-[16px] text-outline ml-1">expand_more</span>
+            </div>
+            <button class="flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors text-label-lg font-label-lg shadow-sm" type="button">
+                <span class="material-symbols-outlined text-[18px] text-on-surface-variant">download</span>
+                <span>Export Summary</span>
+            </button>
+            <a class="flex items-center gap-space-xs px-space-lg py-2.5 rounded-lg bg-primary-container text-on-primary-container hover:bg-secondary font-label-lg text-label-lg font-bold transition-all shadow-md" asp-controller="Events" asp-action="Create">
+                <span class="material-symbols-outlined text-[20px]">add</span>
+                <span>Create Event</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Executive KPI Summary Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-gutter mb-space-xl">
+        <!-- Total Events -->
+        <div class="relative overflow-hidden rounded-xl bg-surface-container p-space-lg flex flex-col justify-between shadow-sm">
+            <div class="flex items-start justify-between">
+                <div class="flex flex-col">
+                    <span class="font-label-caps text-label-caps uppercase text-outline">Portfolio Scale</span>
+                    <span class="font-label-lg text-label-lg text-on-surface-variant mt-0.5">Total Events</span>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[22px]">festival</span>
+                </div>
+            </div>
+            <div class="mt-space-lg">
+                <div class="font-headline-lg text-headline-lg text-on-surface leading-none">@Model.TotalEvents</div>
+                <div class="flex items-center gap-2 mt-space-sm pt-space-xs">
+                    <span class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary"></span> @Model.UpcomingEventsCount Upcoming
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets Sold -->
+        <div class="relative overflow-hidden rounded-xl bg-surface-container p-space-lg flex flex-col justify-between shadow-sm">
+            <div class="flex items-start justify-between">
+                <div class="flex flex-col">
+                    <span class="font-label-caps text-label-caps uppercase text-outline">Inventory Liquidity</span>
+                    <span class="font-label-lg text-label-lg text-on-surface-variant mt-0.5">Tickets Sold</span>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[22px]">confirmation_number</span>
+                </div>
+            </div>
+            <div class="mt-space-lg">
+                <div class="font-headline-lg text-headline-lg text-on-surface leading-none">@Model.TicketsSold.ToString("N0")</div>
+                <div class="flex items-center justify-between mt-space-sm pt-space-xs">
+                    <span class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold">
+                        <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                        Active Volume
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 30-Day Revenue -->
+        <div class="relative overflow-hidden rounded-xl bg-surface-container p-space-lg flex flex-col justify-between shadow-sm">
+            <div class="flex items-start justify-between">
+                <div class="flex flex-col">
+                    <span class="font-label-caps text-label-caps uppercase text-outline">Recent Influx</span>
+                    <span class="font-label-lg text-label-lg text-on-surface-variant mt-0.5">30-Day Revenue</span>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[22px]">payments</span>
+                </div>
+            </div>
+            <div class="mt-space-lg">
+                <div class="font-headline-lg text-headline-lg text-on-surface leading-none">R @Model.RevenueLast30Days.ToString("N2")</div>
+                <div class="flex items-center justify-between mt-space-sm pt-space-xs">
+                    <span class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold">
+                        <span class="material-symbols-outlined text-[16px]">bolt</span>
+                        Instant EFT &amp; Card
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gross Revenue -->
+        <div class="relative overflow-hidden rounded-xl bg-surface-container p-space-lg flex flex-col justify-between shadow-sm bg-gradient-to-br from-surface-container via-surface-container to-surface-container-high">
+            <div class="flex items-start justify-between">
+                <div class="flex flex-col">
+                    <span class="font-label-caps text-label-caps uppercase text-primary">Monetary Performance</span>
+                    <span class="font-label-lg text-label-lg text-on-surface font-semibold mt-0.5">Gross Revenue</span>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center font-bold">
+                    <span class="text-[14px]">ZAR</span>
+                </div>
+            </div>
+            <div class="mt-space-lg">
+                <div class="font-headline-md text-headline-md text-primary font-bold leading-none tracking-tight">
+                    R @Model.TotalRevenue.ToString("N2")
+                </div>
+                <div class="flex items-center justify-between mt-space-sm pt-space-xs">
+                    <span class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold">
+                        <span class="material-symbols-outlined text-[16px]">verified</span>
+                        @(Model.HasRevenue ? "SARB Escrow Secured" : "No Revenue Yet")
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sales & Revenue Velocity Section -->
+    <section class="rounded-xl bg-surface-container p-space-lg md:p-space-xl mb-space-xl shadow-md">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-space-md pb-space-lg">
+            <div class="flex flex-col">
+                <div class="flex items-center gap-space-xs">
+                    <span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+                    <h2 class="font-headline-md text-headline-md text-on-surface">Sales Velocity &amp; Revenue Pulse</h2>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                    Database-driven revenue trends and ticket distributions.
+                </p>
+            </div>
+        </div>
+
+        <!-- Editorial Key Statistics Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md py-space-md mb-space-lg rounded-xl bg-surface-container-low px-space-md">
+            <div class="flex items-center gap-space-md">
+                <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[20px]">shopping_cart_checkout</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-label-caps text-label-caps uppercase text-outline">Average Order Value</span>
+                    <span class="font-headline-sm text-headline-sm text-on-surface">R @Model.AverageOrderValue.ToString("N2")</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-space-md">
+                <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[20px]">bolt</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-label-caps text-label-caps uppercase text-outline">Ticket Types Configured</span>
+                    <span class="font-headline-sm text-headline-sm text-on-surface">@Model.Charts.TicketTypeLabels.Count Categories</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-space-md">
+                <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[20px]">query_stats</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-label-caps text-label-caps uppercase text-outline">Sales Status</span>
+                    <span class="font-headline-sm text-headline-sm text-on-surface">@(Model.HasTicketSales ? "Active Flow" : "Initializing")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rich SVG Dynamic Chart Visualization -->
+        <div class="w-full relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg">
+            <div class="flex items-center justify-between text-outline font-label-caps text-label-caps uppercase mb-space-md">
+                <div class="flex items-center gap-space-md">
+                    <span class="inline-flex items-center gap-1.5 text-primary"><span class="w-2.5 h-2.5 rounded-full bg-primary"></span> Revenue Trajectory (ZAR)</span>
+                </div>
+                <span>Units: ZAR</span>
+            </div>
+            <div class="w-full h-64 relative">
+                <svg id="revenue-chart" class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 1000 240"></svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Orders Stream Section -->
+    <section class="flex flex-col gap-space-lg mb-space-xl">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="font-headline-md text-headline-md text-on-surface">Recent Booking Orders</h2>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Real-time transaction stream across your events.</p>
+            </div>
+            <a class="text-primary hover:text-secondary font-label-lg text-label-lg font-semibold flex items-center gap-1" asp-controller="Organizer" asp-action="Bookings">
+                <span>All Bookings</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </a>
+        </div>
+
+        <div class="rounded-xl bg-surface-container overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-surface-container-high text-outline font-label-caps text-label-caps uppercase">
+                            <th class="p-space-md">Reference</th>
+                            <th class="p-space-md">Event</th>
+                            <th class="p-space-md">Tickets</th>
+                            <th class="p-space-md">Amount</th>
+                            <th class="p-space-md">Status</th>
+                            <th class="p-space-md">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-surface-container-high font-body-sm text-body-sm text-on-surface">
+                        @if (Model.RecentOrders != null && Model.RecentOrders.Any())
+                        {
+                            @foreach (var order in Model.RecentOrders)
+                            {
+                                <tr class="hover:bg-surface-container-high transition-colors">
+                                    <td class="p-space-md font-semibold text-primary">@order.BookingReference</td>
+                                    <td class="p-space-md">@order.EventTitle</td>
+                                    <td class="p-space-md">@order.TotalTickets</td>
+                                    <td class="p-space-md font-bold">R @order.TotalAmount.ToString("N2")</td>
+                                    <td class="p-space-md">
+                                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-secondary-container text-on-secondary-container uppercase">
+                                            @order.PaymentStatus
+                                        </span>
+                                    </td>
+                                    <td class="p-space-md text-outline">@order.BookingDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="p-space-lg text-center text-outline">No recent orders recorded yet.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        const revenueValues = @Html.Raw(JsonSerializer.Serialize(Model.Charts.RevenueValues));
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const svg = document.getElementById("revenue-chart");
+            if (!revenueValues || revenueValues.length === 0) return;
+
+            const maxAmount = Math.max(...revenueValues, 100);
+            const width = 1000;
+            const height = 240;
+            const padding = 20;
+
+            const points = revenueValues.map((val, index) => {
+                const x = (index / (revenueValues.length - 1 || 1)) * width;
+                const y = height - (val / maxAmount) * (height - 40) - padding;
+                return { x, y };
+            });
+
+            const pathD = points.reduce((acc, pt, idx) => {
+                return idx === 0 ? `M ${pt.x},${pt.y}` : `${acc} L ${pt.x},${pt.y}`;
+            }, "");
+
+            const areaD = `${pathD} L ${width},${height} L 0,${height} Z`;
+
+            svg.innerHTML = `
+                <defs>
+                    <linearGradient id="dbAreaGrad" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#ffc665" stop-opacity="0.32"></stop>
+                        <stop offset="70%" stop-color="#ffc665" stop-opacity="0.05"></stop>
+                        <stop offset="100%" stop-color="#ffc665" stop-opacity="0.00"></stop>
+                    </linearGradient>
+                    <linearGradient id="dbLineGrad" x1="0" x2="1" y1="0" y2="0">
+                        <stop offset="0%" stop-color="#c4830e"></stop>
+                        <stop offset="50%" stop-color="#ffc665"></stop>
+                        <stop offset="100%" stop-color="#ffddb3"></stop>
+                    </linearGradient>
+                </defs>
+                <line stroke="#282a30" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="1000" y1="60" y2="60"></line>
+                <line stroke="#282a30" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="1000" y1="120" y2="120"></line>
+                <line stroke="#282a30" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="1000" y1="180" y2="180"></line>
+                <path d="${areaD}" fill="url(#dbAreaGrad)"></path>
+                <path d="${pathD}" fill="none" stroke="url(#dbLineGrad)" stroke-linecap="round" stroke-width="3.5"></path>
+            `;
+        });
+    </script>
+}

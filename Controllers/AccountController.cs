@@ -1,4 +1,4 @@
-﻿
+﻿using Evently.Constants;
 using Evently.DTOs;
 using Evently.Interfaces;
 using Evently.ViewModels.Auth;
@@ -22,7 +22,6 @@ namespace Evently.Controllers
         {
             return View();
         }
-
 
         [HttpPost]
         [AllowAnonymous]
@@ -52,13 +51,56 @@ namespace Evently.Controllers
             }
 
             foreach (var error in result.Errors)
-            {
                 ModelState.AddModelError(string.Empty, error.Description);
-            }
 
             return View(model);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult RegisterOrganizer()
+        {
+            return View(new RegisterOrganizerViewModel());
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RegisterOrganizer(RegisterOrganizerViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var dto = new RegisterOrganizerDto
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender,
+                Password = model.Password,
+                ConfirmPassword = model.ConfirmPassword,
+
+                OrganizerName = model.OrganizerName,
+                Description = model.Description,
+                ContactEmail = model.ContactEmail,
+                ContactNumber = model.ContactNumber,
+                WebsiteUrl = model.WebsiteUrl
+            };
+
+            var result = await _authService.RegisterOrganizerAsync(dto);
+
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "Your organizer account has been created. Sign in to set up your first event.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(string.Empty, error.Description);
+
+            return View(model);
+        }
 
         [HttpGet]
         [AllowAnonymous]
@@ -89,6 +131,11 @@ namespace Evently.Controllers
                 {
                     return LocalRedirect(returnUrl);
                 }
+
+                var roles = await _authService.GetRolesAsync(dto.Email);
+
+                if (roles.Contains(AppRoles.Organizer))
+                    return RedirectToAction("Dashboard", "Organizer");
 
                 return RedirectToAction("Dashboard", "Dashboard");
             }

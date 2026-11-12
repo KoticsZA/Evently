@@ -13,6 +13,8 @@ namespace Evently.Models
         public string UserId { get; set; } = string.Empty;
         public AppUser User { get; set; } = null!;
         public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+        public int OrganizerEventId { get; set; }
+        public OrganizerEvent OrganizerEvent { get; set; } = null!;
     }
     public enum OrderStatus
     {

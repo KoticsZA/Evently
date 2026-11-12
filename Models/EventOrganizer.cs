@@ -14,5 +14,6 @@
         public string OwnerUserId { get; set; } = string.Empty;
         public AppUser OwnerUser { get; set; } = null!;
         public ICollection<OrganizerEvent> Events { get; set; }= new List<OrganizerEvent>();
+        public bool IsVerified { get; set; } = false;
     }
 }

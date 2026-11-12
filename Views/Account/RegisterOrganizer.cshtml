@@ -1,0 +1,154 @@
+﻿@using Evently.ViewModels.Auth
+@model RegisterOrganizerViewModel
+@{
+    ViewData["Title"] = "Become an organizer";
+    const string input = "w-full bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline/70 px-4 py-3 rounded-lg border border-transparent focus:outline-none focus:bg-surface-container focus:border-primary/60 transition-all";
+    const string label = "font-label-md text-label-md text-on-surface";
+    const string error = "text-error font-label-md text-label-md";
+}
+
+<div class="w-full flex-1 bg-surface px-margin-mobile sm:px-space-xl py-space-xl">
+    <div class="w-full max-w-2xl mx-auto flex flex-col gap-space-lg">
+
+        <div class="flex flex-col gap-space-xs">
+            <span class="font-label-caps text-label-caps uppercase tracking-widest text-primary font-bold">Event organizers</span>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile lg:font-headline-lg lg:text-headline-lg text-on-surface tracking-tight">Host your events on Evently</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant">Create your organizer account to publish events, sell tickets and track sales in one place.</p>
+        </div>
+
+        <form asp-controller="Account" asp-action="RegisterOrganizer" method="post" class="flex flex-col gap-space-lg" novalidate>
+
+            <div asp-validation-summary="ModelOnly"
+                 class="rounded-lg bg-error-container/30 border border-error/30 text-error font-label-md text-label-md px-3 py-2.5" role="alert"></div>
+
+            <!-- Organisation -->
+            <fieldset class="flex flex-col gap-space-md rounded-xl bg-surface-container-low p-space-lg">
+                <legend class="font-headline-sm text-headline-sm text-on-surface px-2">Your organisation</legend>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="OrganizerName" class="@label">Organisation name <span class="text-primary">*</span></label>
+                    <input asp-for="OrganizerName" placeholder="e.g. Kirstenbosch Concerts" class="@input" />
+                    <span asp-validation-for="OrganizerName" class="@error"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="Description" class="@label">About your organisation <span class="text-primary">*</span></label>
+                    <textarea asp-for="Description" rows="4" placeholder="What kind of events do you host?" class="@input"></textarea>
+                    <span asp-validation-for="Description" class="@error"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="ContactEmail" class="@label">Public contact email <span class="text-on-surface-variant font-normal">(optional)</span></label>
+                        <input asp-for="ContactEmail" class="@input" />
+                        <span asp-validation-for="ContactEmail" class="@error"></span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="ContactNumber" class="@label">Contact number <span class="text-on-surface-variant font-normal">(optional)</span></label>
+                        <input asp-for="ContactNumber" class="@input" />
+                        <span asp-validation-for="ContactNumber" class="@error"></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="WebsiteUrl" class="@label">Website <span class="text-on-surface-variant font-normal">(optional)</span></label>
+                    <input asp-for="WebsiteUrl" placeholder="https://" class="@input" />
+                    <span asp-validation-for="WebsiteUrl" class="@error"></span>
+                </div>
+            </fieldset>
+
+            <!-- Account owner -->
+            <fieldset class="flex flex-col gap-space-md rounded-xl bg-surface-container-low p-space-lg">
+                <legend class="font-headline-sm text-headline-sm text-on-surface px-2">Account owner</legend>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="FirstName" class="@label">First name <span class="text-primary">*</span></label>
+                        <input asp-for="FirstName" autocomplete="given-name" class="@input" />
+                        <span asp-validation-for="FirstName" class="@error"></span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="LastName" class="@label">Last name <span class="text-primary">*</span></label>
+                        <input asp-for="LastName" autocomplete="family-name" class="@input" />
+                        <span asp-validation-for="LastName" class="@error"></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="Email" class="@label">Email address <span class="text-primary">*</span></label>
+                    <input asp-for="Email" autocomplete="email" class="@input" />
+                    <span asp-validation-for="Email" class="@error"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="DateOfBirth" class="@label">Date of birth <span class="text-primary">*</span></label>
+                        <input asp-for="DateOfBirth" class="@input [color-scheme:dark]" />
+                        <span asp-validation-for="DateOfBirth" class="@error"></span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="Gender" class="@label">Gender <span class="text-on-surface-variant font-normal">(optional)</span></label>
+                        <select asp-for="Gender" class="@input appearance-none cursor-pointer">
+                            <option value="">Select (optional)</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Non-binary">Non-binary</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="Password" class="@label">Password <span class="text-primary">*</span></label>
+                        <div class="relative flex items-center">
+                            <input asp-for="Password" autocomplete="new-password" class="@input pr-11" />
+                            <button type="button" data-toggle-password="Password" aria-label="Toggle password visibility"
+                                    class="absolute right-2.5 p-1 rounded text-outline hover:text-on-surface transition-colors flex items-center">
+                                <span class="material-symbols-outlined text-[19px]">visibility</span>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="@error"></span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="ConfirmPassword" class="@label">Confirm password <span class="text-primary">*</span></label>
+                        <div class="relative flex items-center">
+                            <input asp-for="ConfirmPassword" autocomplete="new-password" class="@input pr-11" />
+                            <button type="button" data-toggle-password="ConfirmPassword" aria-label="Toggle confirm password visibility"
+                                    class="absolute right-2.5 p-1 rounded text-outline hover:text-on-surface transition-colors flex items-center">
+                                <span class="material-symbols-outlined text-[19px]">visibility</span>
+                            </button>
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="@error"></span>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="flex flex-col gap-1.5">
+                <div class="flex items-start gap-3">
+                    <input asp-for="AgreeTerms" class="w-4 h-4 mt-1 rounded accent-primary cursor-pointer" />
+                    <label asp-for="AgreeTerms" class="font-body-sm text-body-sm text-on-surface-variant cursor-pointer">
+                        I agree to Evently's <a class="text-primary hover:underline underline-offset-4" href="#">Terms of Service</a>
+                        and <a class="text-primary hover:underline underline-offset-4" href="#">Privacy Charter</a>.
+                    </label>
+                </div>
+                <span asp-validation-for="AgreeTerms" class="@error"></span>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-primary hover:bg-primary-container active:scale-[0.99] text-on-primary font-label-lg text-label-lg font-bold py-4 px-6 rounded-lg uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <span>Create organizer account</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+
+            <p class="text-center font-body-md text-body-md text-on-surface-variant">
+                Just want to attend events?
+                <a asp-controller="Account" asp-action="Register" class="text-primary hover:text-primary-container font-semibold transition-colors">Create an attendee account</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

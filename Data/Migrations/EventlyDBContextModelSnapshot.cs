@@ -249,6 +249,9 @@ namespace Evently.Data.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LogoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -275,15 +278,24 @@ namespace Evently.Data.Migrations
 
             modelBuilder.Entity("Evently.Models.OrganizerEvent", b =>
                 {
-                    b.Property<int>("OrganizerId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.HasKey("OrganizerId", "EventId");
+                    b.Property<int>("OrganizerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("EventId");
+
+                    b.HasIndex("OrganizerId", "EventId")
+                        .IsUnique();
 
                     b.ToTable("OrganizerEvents");
                 });
@@ -356,6 +368,9 @@ namespace Evently.Data.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
+                    b.Property<int>("OrganizerEventId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("PaidAt")
                         .HasColumnType("datetime2");
 
@@ -374,6 +389,8 @@ namespace Evently.Data.Migrations
 
                     b.HasIndex("OrderNumber")
                         .IsUnique();
+
+                    b.HasIndex("OrganizerEventId");
 
                     b.HasIndex("UserId", "CreatedAt");
 
@@ -678,13 +695,13 @@ namespace Evently.Data.Migrations
                     b.HasOne("Evently.Models.Event", "Event")
                         .WithMany("Organizers")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Evently.Models.EventOrganizer", "Organizer")
                         .WithMany("Events")
                         .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Event");
@@ -713,11 +730,19 @@ namespace Evently.Data.Migrations
 
             modelBuilder.Entity("Evently.Models.TicketOrder", b =>
                 {
+                    b.HasOne("Evently.Models.OrganizerEvent", "OrganizerEvent")
+                        .WithMany("TicketOrders")
+                        .HasForeignKey("OrganizerEventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Evently.Models.AppUser", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("OrganizerEvent");
 
                     b.Navigation("User");
                 });
@@ -830,6 +855,11 @@ namespace Evently.Data.Migrations
             modelBuilder.Entity("Evently.Models.EventOrganizer", b =>
                 {
                     b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("Evently.Models.OrganizerEvent", b =>
+                {
+                    b.Navigation("TicketOrders");
                 });
 
             modelBuilder.Entity("Evently.Models.TicketOrder", b =>

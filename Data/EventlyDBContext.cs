@@ -248,21 +248,21 @@ namespace Evently.Data
 
             builder.Entity<OrganizerEvent>(entity =>
             {
-                entity.HasKey(oe => new
+                entity.HasKey(oe => oe.Id);
+
+                entity.HasIndex(oe => new
                 {
                     oe.OrganizerId,
                     oe.EventId
-                });
+                }).IsUnique();
 
                 entity.HasOne(oe => oe.Organizer)
                     .WithMany(o => o.Events)
-                    .HasForeignKey(oe => oe.OrganizerId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .HasForeignKey(oe => oe.OrganizerId);
 
                 entity.HasOne(oe => oe.Event)
                     .WithMany(e => e.Organizers)
-                    .HasForeignKey(oe => oe.EventId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .HasForeignKey(oe => oe.EventId);
             });
 
 
@@ -343,6 +343,11 @@ namespace Evently.Data
                 entity.HasOne(o => o.User)
                     .WithMany(u => u.Orders)
                     .HasForeignKey(o => o.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(t => t.OrganizerEvent)
+                    .WithMany(oe => oe.TicketOrders)
+                    .HasForeignKey(t => t.OrganizerEventId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasMany(o => o.Tickets)
