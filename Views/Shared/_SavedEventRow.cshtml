@@ -1,0 +1,41 @@
+﻿@using Evently.Helpers
+@using Evently.ViewModels.Events
+@model EventCardViewModel
+@{
+    int        id        = Model.EventId;
+    string     title     = Model.Title;
+    string?    imageUrl  = Model.CoverImageUrl;
+    string     venue     = Model.VenueName;
+    string     city      = Model.City;
+    DateTime   start     = Model.StartDateTime;
+    decimal?   fromPrice = Model.MinimumTicketPrice;
+
+    var isFree = fromPrice is null or 0m;
+    var saveUrl = Url.Action("ToggleSave", "Events", new { id });
+}
+<div data-saved-row class="p-4 rounded-xl bg-surface-container-low border border-[#222530] shadow-sm flex items-center justify-between gap-4 hover:border-secondary/40 transition-colors">
+    <div class="flex items-center gap-3.5 min-w-0">
+        <div class="w-16 h-16 rounded-lg bg-surface-container shrink-0 overflow-hidden border border-[#222530]">
+            @if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                <img src="@imageUrl" alt="" loading="lazy" class="w-full h-full object-cover" />
+            }
+        </div>
+        <div class="min-w-0">
+            <h4 class="font-title-md text-title-md text-[#faf9fd] truncate">@title</h4>
+            <p class="font-body-sm text-body-sm text-[#8e92a4] truncate">@city • @UiFormat.ShortDate(start)</p>
+            <span class="font-label-sm text-label-sm text-secondary font-semibold">@(isFree ? "Free RSVP" : "From " + UiFormat.Rand(fromPrice!.Value))</span>
+        </div>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+        <a asp-controller="Events" asp-action="Details" asp-route-id="@id"
+           class="px-3 py-1.5 rounded-lg bg-secondary text-[#0c0e14] font-label-md text-label-md font-bold hover:bg-[#ffc665] transition-colors">
+            @(isFree ? "Reserve" : "Book")
+        </a>
+        <button type="button" title="Remove from saved" aria-label="Remove from saved"
+                data-save-toggle data-remove-row data-save-url="@saveUrl"
+                class="p-1.5 text-[#8e92a4] hover:text-error transition-colors">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+    </div>
+</div>

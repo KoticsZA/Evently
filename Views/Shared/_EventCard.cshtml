@@ -1,0 +1,57 @@
+﻿@using Evently.Helpers
+@using Evently.ViewModels.Events
+@model EventCardViewModel
+@{
+    int        id        = Model.EventId;
+    string     title     = Model.Title;
+    string?    imageUrl  = Model.CoverImageUrl;
+    string     venue     = Model.VenueName;
+    string     city      = Model.City;
+    DateTime   start     = Model.StartDateTime;
+    decimal?   fromPrice = Model.MinimumTicketPrice;      
+
+    var isFree = fromPrice is null or 0m;
+    var saveUrl = Url.Action("ToggleSave", "Events", new { id });
+}
+<article class="bg-surface-container-low border border-[#222530] rounded-2xl overflow-hidden shadow-md hover:border-secondary/50 transition-all flex flex-col group">
+    <div class="relative h-48 w-full overflow-hidden bg-surface-container">
+        @if (!string.IsNullOrWhiteSpace(imageUrl))
+        {
+            <img src="@imageUrl" alt="@title" loading="lazy"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        }
+        else
+        {
+            <div class="w-full h-full flex items-center justify-center text-[#63687b]">
+                <span class="material-symbols-outlined text-[40px]">image</span>
+            </div>
+        }
+        <button type="button" aria-label="Save event" data-save-toggle data-save-url="@saveUrl"
+                class="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#0c0e14]/75 backdrop-blur-md border border-white/10 flex items-center justify-center text-[#faf9fd] hover:text-secondary transition-colors">
+            <span class="material-symbols-outlined text-[18px]">bookmark_border</span>
+        </button>
+    </div>
+    <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+        <div>
+            <div class="text-secondary font-label-sm text-label-sm uppercase tracking-wider mb-1 font-semibold truncate">
+                @(string.IsNullOrWhiteSpace(city) ? venue : venue + ", " + city)
+            </div>
+            <h3 class="font-title-md text-title-md text-[#faf9fd] group-hover:text-secondary transition-colors line-clamp-1">
+                <a asp-controller="Events" asp-action="Details" asp-route-id="@id">@title</a>
+            </h3>
+            <p class="font-body-sm text-body-sm text-[#8e92a4] mt-1">@UiFormat.Day(start) • @UiFormat.Time(start)</p>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-[#222530]/60">
+            <div>
+                <span class="font-label-sm text-label-sm text-[#8e92a4] block">@(isFree ? "Patron Access" : "From")</span>
+                <span class="font-title-md text-title-md text-secondary font-bold">@(isFree ? "Free RSVP" : UiFormat.Rand(fromPrice!.Value))</span>
+            </div>
+            <a asp-controller="Events" asp-action="Details" asp-route-id="@id"
+               class="px-3.5 py-1.5 rounded-lg font-label-md text-label-md transition-colors @(isFree
+                    ? "bg-secondary/15 hover:bg-secondary hover:text-[#0c0e14] text-secondary border border-secondary/40 font-semibold"
+                    : "bg-surface-container hover:bg-secondary hover:text-[#0c0e14] text-[#faf9fd] border border-[#222530] font-medium")">
+                @(isFree ? "Reserve seat" : "Book tickets")
+            </a>
+        </div>
+    </div>
+</article>

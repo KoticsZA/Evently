@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+
+<section class="relative w-full flex-1 min-h-[calc(100vh-4rem)] flex items-center overflow-hidden">
+    <!-- Cinematic background -->
+    <div class="absolute inset-0 bg-cover bg-center ken-burns-bg will-change-transform"
+         style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCaxKaOtdGXs1xJy7PQ-VgHZNxh5bTmr2gjUT0VPplevHsLOvgACihSrocZroPKbRU8RUYfyvBq8mxPe227l8HovpJeBLqWqpS23uY5LWdc8uApEpquR-rtbVQrtXs4AqCTyJUibNpVqS_SOZibaKR4dyB21h9eg0cOC3ZClDdskbDGD7jqymTqj81Y56-JtpndnsQFbyKylhHznyWv1GnjSaG2hhaHE6_lO6CGtC4');"></div>
+    <div class="absolute inset-0 ambient-shimmer bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/70 to-surface-container-lowest/30"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-surface-container-lowest/80 via-surface-container-lowest/30 to-transparent"></div>
+
+    <div class="relative z-10 w-full px-margin-mobile lg:px-margin py-space-xl">
+        <div class="max-w-2xl flex flex-col gap-space-lg">
+
+            <div class="anim-fade-in-down inline-flex self-start items-center gap-space-xs px-3 py-1.5 rounded-lg bg-surface-container-lowest/80 backdrop-blur-md shadow-md border border-white/5">
+                <span class="w-2 h-2 rounded-full bg-primary animate-beacon"></span>
+                <span class="font-label-caps text-label-caps text-on-surface tracking-widest uppercase">Curated Experiences • Since 2019</span>
+            </div>
+
+            <div class="flex flex-col gap-space-sm anim-fade-in-up anim-delay-100">
+                <h1 class="font-display-lg text-display-lg-mobile lg:text-display-lg text-on-surface">
+                    Where South Africa's most <em class="text-primary not-italic">memorable</em> nights begin.
+                </h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                    Access the country's most sought-after cultural, culinary and musical gatherings, from golden-hour amphitheatre showcases at Kirstenbosch to electric warehouse sessions at Constitution Hill.
+                </p>
+            </div>
+
+            <!-- Primary calls to action -->
+            <div class="flex flex-col sm:flex-row gap-space-md anim-fade-in-up anim-delay-300">
+                <a asp-controller="Account" asp-action="Register"
+                   class="relative overflow-hidden group inline-flex items-center justify-center gap-space-xs py-3.5 px-8 rounded-lg bg-primary hover:bg-secondary active:scale-[0.98] text-on-primary font-label-lg text-label-lg font-bold tracking-wider uppercase shadow-lg shadow-primary/10 transition-all duration-200">
+                    <span class="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-[shimmerSweep_0.8s_ease-out] pointer-events-none"></span>
+                    <span class="relative z-10">Create an account</span>
+                    <span class="material-symbols-outlined text-[18px] relative z-10 transition-transform duration-200 group-hover:translate-x-1.5">arrow_forward</span>
+                </a>
+
+                <a asp-controller="Account" asp-action="Login"
+                   class="group inline-flex items-center justify-center gap-space-xs py-3.5 px-8 rounded-lg bg-surface-container-lowest/60 backdrop-blur-md border border-primary/40 hover:border-primary hover:bg-surface-container/70 active:scale-[0.98] text-primary font-label-lg text-label-lg font-bold tracking-wider uppercase transition-all duration-200">
+                    <span>Sign in</span>
+                    <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:translate-x-1.5">login</span>
+                </a>
+            </div>
+
+            <!-- Live ticker -->
+            <div class="anim-fade-in-up anim-delay-400 p-4 rounded-xl bg-surface-container/70 backdrop-blur-md border border-white/5 shadow-xl flex items-center justify-between gap-space-md max-w-xl hover:bg-surface-container/85 transition-all duration-300">
+                <div class="flex items-center gap-space-sm min-w-0">
+                    <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-primary text-[20px]">confirmation_number</span>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 font-label-caps text-label-caps text-primary uppercase">
+                            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-beacon"></span>
+                            <span>Live Ticker</span>
+                        </div>
+                        <div class="font-body-sm text-body-sm text-on-surface truncate">Now booking: 140+ headline events across Western Cape, Gauteng &amp; KZN</div>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-space-xs text-secondary shrink-0 font-label-md text-label-md">
+                    <span class="material-symbols-outlined text-[16px]">verified</span>
+                    <span>Reserved Seating</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Value props -->
+<section class="w-full bg-surface-container-low px-margin-mobile lg:px-margin py-space-xl">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+        @foreach (var f in new[] {
+            (Icon: "nightlife",            Title: "Curated access",       Text: "Intimate secret sets, wine-country festivals and sold-out arena shows, handpicked by our editors."),
+            (Icon: "verified_user",        Title: "Guaranteed authentic", Text: "Every ticket is verified at source, with instant digital gate-passes delivered to your inbox."),
+            (Icon: "event_seat",           Title: "Reserved seating",     Text: "Choose your exact seat, unlock private guestlists and manage every booking in one place.")
+        })
+        {
+            <div class="group p-space-lg rounded-xl bg-surface-container/40 border border-transparent hover:border-primary/30 hover:bg-surface-container/70 hover:-translate-y-0.5 transition-all duration-300">
+                <div class="w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center mb-space-md transition-colors">
+                    <span class="material-symbols-outlined text-primary text-[22px]">@f.Icon</span>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">@f.Title</h3>
+                <p class="font-body-md text-body-md text-on-surface-variant">@f.Text</p>
+            </div>
+        }
+    </div>
+</section>

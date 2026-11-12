@@ -1,0 +1,170 @@
+﻿@model Evently.ViewModels.Auth.LoginViewModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<div class="flex flex-col w-full">
+<div class="w-full flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
+
+    <!-- Left Column: Cinematic Visual Panel -->
+    <div class="relative w-full lg:w-1/2 flex flex-col justify-between overflow-hidden min-h-[480px] lg:min-h-0 bg-surface-container-lowest">
+        <div class="absolute inset-0 bg-cover bg-center ken-burns-bg will-change-transform"
+             style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCaxKaOtdGXs1xJy7PQ-VgHZNxh5bTmr2gjUT0VPplevHsLOvgACihSrocZroPKbRU8RUYfyvBq8mxPe227l8HovpJeBLqWqpS23uY5LWdc8uApEpquR-rtbVQrtXs4AqCTyJUibNpVqS_SOZibaKR4dyB21h9eg0cOC3ZClDdskbDGD7jqymTqj81Y56-JtpndnsQFbyKylhHznyWv1GnjSaG2hhaHE6_lO6CGtC4');"></div>
+        <div class="absolute inset-0 ambient-shimmer bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent pointer-events-none"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/60 to-surface-container-lowest/20"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-surface-container-lowest/40 to-transparent"></div>
+
+        <div class="relative z-10 p-space-lg lg:p-margin flex items-center justify-between anim-fade-in-down">
+            <div class="inline-flex items-center gap-space-xs px-3 py-1.5 rounded-lg bg-surface-container-lowest/80 backdrop-blur-md shadow-md border border-white/5 transition-transform hover:scale-[1.02]">
+                <span class="w-2 h-2 rounded-full bg-primary animate-beacon"></span>
+                <span class="font-label-caps text-label-caps text-on-surface tracking-widest uppercase">Cape Town Cultural Festival • Sunset Session</span>
+            </div>
+            <div class="hidden sm:flex items-center gap-space-xs text-on-surface-variant font-label-md text-label-md tracking-wider">
+                <span class="material-symbols-outlined text-[16px] text-primary">pin_drop</span>
+                <span>Table Mountain Vista • 33.9249° S</span>
+            </div>
+        </div>
+
+        <div class="relative z-10 p-space-lg lg:p-margin flex flex-col gap-space-lg">
+            <div class="space-y-space-sm max-w-lg anim-fade-in-up anim-delay-200">
+                <div class="inline-block font-label-caps text-label-caps text-primary tracking-widest uppercase">Curated Experiences • Since 2019</div>
+                <p class="font-headline-lg text-headline-lg font-headline-md text-on-surface leading-tight drop-shadow-sm">
+                    Access South Africa’s most sought-after cultural, culinary, and musical gatherings.
+                </p>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                    From golden-hour amphitheatre showcases at Kirstenbosch to electric warehouse sessions at Constitution Hill.
+                </p>
+            </div>
+
+            <div class="anim-fade-in-up anim-delay-300 p-4 rounded-xl bg-surface-container/70 backdrop-blur-md border border-white/5 shadow-xl flex items-center justify-between gap-space-md hover:bg-surface-container/85 transition-all duration-300">
+                <div class="flex items-center gap-space-sm min-w-0">
+                    <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-primary text-[20px]">confirmation_number</span>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 font-label-caps text-label-caps text-primary uppercase">
+                            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-beacon"></span>
+                            <span>Live Ticker</span>
+                        </div>
+                        <div class="font-body-sm text-body-sm text-on-surface truncate">Now booking: 140+ headline events across Western Cape, Gauteng &amp; KZN</div>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-space-xs text-secondary shrink-0 font-label-md text-label-md">
+                    <span class="material-symbols-outlined text-[16px]">verified</span>
+                    <span>Reserved Seating</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Sign-in form -->
+    <div class="w-full lg:w-1/2 bg-surface-container-low flex flex-col justify-center px-margin-mobile sm:px-12 lg:px-16 py-12 lg:py-16">
+        <div class="w-full max-w-md mx-auto flex flex-col">
+
+            <div class="mb-space-lg anim-fade-in-up anim-delay-100">
+                <div class="font-label-caps text-label-caps text-primary uppercase tracking-widest mb-space-xs font-semibold">Member Access</div>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mb-space-xs">Sign in to your account</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                    Enter your registered credentials to manage your premier reservations and unlock private guestlists.
+                </p>
+            </div>
+
+            @if (TempData["Success"] is string success)
+            {
+                <div class="mb-space-md flex items-center gap-2 rounded-lg bg-primary/10 border border-primary/30 text-primary font-label-md text-label-md px-3 py-2.5" role="status">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    <span>@success</span>
+                </div>
+            }
+
+            <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post"
+                  class="flex flex-col gap-space-md anim-fade-in-up anim-delay-200" novalidate>
+
+                <div asp-validation-summary="ModelOnly"
+                     class="rounded-lg bg-error-container/30 border border-error/30 text-error font-label-md text-label-md px-3 py-2.5" role="alert"></div>
+
+                <!-- Email -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between">
+                        <label asp-for="Email" class="font-label-lg text-label-lg text-on-surface font-medium">Email address</label>
+                        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Required</span>
+                    </div>
+                    <div class="relative flex items-center group">
+                        <input asp-for="Email" autocomplete="email" placeholder="e.g. lesedi.dlamini@@domain.co.za"
+                               class="peer form-control w-full bg-surface-container-lowest text-on-surface placeholder-on-surface-variant/40 pl-11 pr-4 py-3 rounded-lg font-body-md text-body-md outline-none border border-transparent transition-all duration-300 focus:bg-surface-container focus:border-primary focus:ring-2 focus:ring-primary-container/30 focus:shadow-[0_0_15px_rgba(255,198,101,0.15)]" />
+                        <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant pointer-events-none transition-colors duration-300 peer-focus:text-primary text-[20px]">alternate_email</span>
+                    </div>
+                    <span asp-validation-for="Email" class="text-error font-label-md text-label-md mt-1"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between">
+                        <label asp-for="Password" class="font-label-lg text-label-lg text-on-surface font-medium">Password</label>
+                        <a class="gold-underline font-label-md text-label-md text-primary hover:text-primary-fixed transition-colors duration-300" href="#">Forgot password?</a>
+                    </div>
+                    <div class="relative flex items-center group">
+                        <input asp-for="Password" autocomplete="current-password" placeholder="••••••••••••"
+                               class="peer form-control w-full bg-surface-container-lowest text-on-surface placeholder-on-surface-variant/40 pl-11 pr-11 py-3 rounded-lg font-body-md text-body-md outline-none border border-transparent transition-all duration-300 focus:bg-surface-container focus:border-primary focus:ring-2 focus:ring-primary-container/30 focus:shadow-[0_0_15px_rgba(255,198,101,0.15)]" />
+                        <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant pointer-events-none transition-colors duration-300 peer-focus:text-primary text-[20px]">lock</span>
+                        <button type="button" data-toggle-password="Password" aria-label="Toggle password visibility"
+                                class="absolute right-3 text-on-surface-variant hover:text-on-surface p-1.5 rounded transition-all duration-200 hover:scale-110 active:scale-95 flex items-center justify-center cursor-pointer">
+                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-error font-label-md text-label-md mt-1"></span>
+                </div>
+
+                <!-- Remember me -->
+                <div class="flex items-center justify-between pt-1">
+                    <label class="relative flex items-center gap-space-sm cursor-pointer select-none group">
+                        <input asp-for="RememberMe" class="peer sr-only" />
+                        <div class="checkbox-box w-4 h-4 rounded bg-surface-container-lowest border border-outline/30 flex items-center justify-center group-hover:border-primary/60">
+                            <span class="material-symbols-outlined text-[14px] text-on-primary font-bold hidden peer-checked:block transition-all duration-150 scale-0 peer-checked:scale-100">check</span>
+                        </div>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Remember this device for 30 days</span>
+                    </label>
+                    <div class="hidden sm:flex items-center gap-1 font-label-caps text-label-caps text-on-surface-variant/70 uppercase">
+                        <span class="material-symbols-outlined text-[13px] text-secondary">shield</span>
+                        <span>Encrypted</span>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="relative overflow-hidden group w-full mt-space-sm py-3.5 px-6 rounded-lg bg-primary hover:bg-secondary active:scale-[0.98] text-on-primary font-label-lg text-label-lg font-bold tracking-wider uppercase shadow-lg shadow-primary/10 transition-all duration-200 flex items-center justify-center gap-space-xs cursor-pointer">
+                    <span class="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-[shimmerSweep_0.8s_ease-out] pointer-events-none"></span>
+                    <span class="relative z-10">Sign in</span>
+                    <span class="material-symbols-outlined text-[18px] relative z-10 transition-transform duration-200 group-hover:translate-x-1.5">arrow_forward</span>
+                </button>
+
+                <div class="text-center pt-space-xs">
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">Don’t have an account?</span>
+                    <a asp-controller="Account" asp-action="Register"
+                       class="gold-underline ml-1 font-label-lg text-label-lg text-primary hover:text-primary-fixed font-semibold transition-colors duration-300">Create an account</a>
+                </div>
+            </form>
+
+            <!-- Organiser portal -->
+            <div class="anim-fade-in-up anim-delay-400 mt-space-xl pt-space-lg bg-surface-container/30 border border-transparent rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-surface-container/50 group">
+                <div class="flex items-center gap-space-sm">
+                    <div class="w-8 h-8 rounded-lg bg-surface-variant flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
+                        <span class="material-symbols-outlined text-on-surface group-hover:text-primary transition-colors text-[18px]">confirmation_number</span>
+                    </div>
+                    <div>
+                        <div class="font-label-caps text-label-caps text-on-surface-variant uppercase">Event Presenters</div>
+                        <div class="font-body-sm text-body-sm text-on-surface font-medium">Hosting an experience?</div>
+                    </div>
+                </div>
+                <a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-primary-fixed font-semibold tracking-wide transition-colors" href="#">
+                    <span>Organiser Portal</span>
+                    <span class="material-symbols-outlined text-[16px] transition-transform duration-200 group-hover:translate-x-1">chevron_right</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
