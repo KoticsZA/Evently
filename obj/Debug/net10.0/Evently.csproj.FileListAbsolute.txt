@@ -232,3 +232,5 @@ C:\Users\Unakho\source\repos\Evently\Evently\obj\Debug\net10.0\refint\Evently.dl
 C:\Users\Unakho\source\repos\Evently\Evently\obj\Debug\net10.0\Evently.pdb
 C:\Users\Unakho\source\repos\Evently\Evently\obj\Debug\net10.0\Evently.genruntimeconfig.cache
 C:\Users\Unakho\source\repos\Evently\Evently\obj\Debug\net10.0\ref\Evently.dll
+C:\Users\Unakho\source\repos\Evently\Evently\obj\Debug\net10.0\Evently.sourcelink.json
+C:\Users\Unakho\source\repos\Evently\Evently\obj\Debug\net10.0\compressed\sts6v1m4t9-{0}-wmulu8jw4c-wmulu8jw4c.gz

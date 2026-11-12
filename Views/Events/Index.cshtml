@@ -1,0 +1,143 @@
+﻿@using Evently.Helpers
+@using Evently.ViewModels.Events
+@model EventDiscoveryViewModel
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Discover events";
+    ViewData["ActiveNav"] = "discover";
+
+    var f = Model.Filter;
+    var hasFilters = f.HasActiveFilters;
+    var regionLabel = Model.Regions.FirstOrDefault(r => r.Value == (f.Region ?? ""))?.Label ?? "All South Africa";
+
+    const string ring = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+    const string h2 = "font-headline-sm text-headline-sm text-on-surface";
+    const string pageBtn = "h-10 px-4 inline-flex items-center gap-1 rounded-lg border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container transition-colors";
+
+    Dictionary<string, string?> RouteFor(int page) => new()
+    {
+        ["q"] = f.Query, ["category"] = f.Category, ["region"] = f.Region,
+        ["when"] = f.When, ["price"] = f.Price, ["sort"] = f.Sort, ["page"] = page.ToString()
+    };
+}
+
+<div class="w-full max-w-[1200px] mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin py-10 flex flex-col gap-10">
+
+    <header class="flex flex-col gap-6">
+        <div>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface tracking-tight">Discover events</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant mt-1">Live music, culture, food and festivals across South Africa.</p>
+        </div>
+
+        <form method="get" asp-controller="Events" asp-action="Index" role="search" class="flex flex-col gap-5">
+            <div>
+                <label for="eventSearch" class="sr-only">Search events</label>
+                <div class="flex items-center gap-2 h-12 pl-4 pr-1.5 rounded-lg bg-surface-container-low border border-outline-variant focus-within:border-secondary transition-colors">
+                    <span class="material-symbols-outlined text-[20px] text-on-surface-variant" aria-hidden="true">search</span>
+                    <input id="eventSearch" name="q" type="search" value="@f.Query" autocomplete="off"
+                           placeholder="Search artists, events or venues"
+                           class="flex-1 min-w-0 bg-transparent border-0 p-0 text-on-surface placeholder:text-on-surface-variant focus:ring-0 focus:outline-none font-body-md text-body-md" />
+                    <button type="submit" class="h-9 px-4 rounded-lg bg-secondary text-on-secondary-container font-label-lg text-label-lg hover:bg-primary transition-colors cursor-pointer @ring">Search</button>
+                </div>
+            </div>
+
+            <!-- Category pills -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="group" aria-label="Category">
+                @foreach (var c in Model.Categories)
+                {
+                    <button type="submit" name="category" value="@c.Value" aria-pressed="@((f.Category ?? "") == c.Value ? "true" : "false")"
+                            class="shrink-0 h-9 px-4 inline-flex items-center gap-1.5 rounded-full border border-outline-variant text-on-surface-variant font-label-md text-label-md transition-colors cursor-pointer hover:text-on-surface hover:bg-surface-container aria-pressed:bg-secondary aria-pressed:text-on-secondary-container aria-pressed:border-secondary @ring">
+                        @if (!string.IsNullOrEmpty(c.Icon))
+                        {
+                            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">@c.Icon</span>
+                        }
+                        @c.Label
+                    </button>
+                }
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <partial name="_FilterSelect" model='new FilterSelectModel("region", "Region", f.Region, Model.Regions)' />
+                <partial name="_FilterSelect" model='new FilterSelectModel("when", "Date", f.When, Model.Dates)' />
+                <partial name="_FilterSelect" model='new FilterSelectModel("price", "Price", f.Price, Model.Prices)' />
+                <partial name="_FilterSelect" model='new FilterSelectModel("sort", "Sort by", f.Sort, Model.SortOptions)' />
+            </div>
+        </form>
+    </header>
+
+    <section aria-labelledby="results-heading" class="flex flex-col gap-4">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+            <h2 id="results-heading" class="@h2" aria-live="polite">
+                @Model.TotalCount @(Model.TotalCount == 1 ? "event" : "events")@(string.IsNullOrWhiteSpace(f.Region) ? "" : " in " + regionLabel)
+            </h2>
+            @if (hasFilters)
+            {
+                <a asp-controller="Events" asp-action="Index"
+                   class="inline-flex items-center gap-1 font-label-lg text-label-lg text-secondary hover:text-primary transition-colors rounded @ring">
+                    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">filter_alt_off</span>Clear filters
+                </a>
+            }
+        </div>
+
+        @if (Model.Events.Count == 0)
+        {
+            <div class="rounded-xl border border-dashed border-outline-variant px-6 py-14 flex flex-col items-center text-center gap-4">
+                <span class="material-symbols-outlined text-[32px] text-on-surface-variant" aria-hidden="true">event_busy</span>
+                <div>
+                    <h3 class="font-title-md text-title-md text-on-surface">No events match your search</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-sm">Try a wider region or date range, or clear your filters to see everything.</p>
+                </div>
+                @if (hasFilters)
+                {
+                    <a asp-controller="Events" asp-action="Index"
+                       class="h-11 px-6 rounded-lg bg-secondary text-on-secondary-container font-label-lg text-label-lg hover:bg-primary transition-colors inline-flex items-center @ring">Clear filters</a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                @foreach (var ev in Model.Events)
+                {
+                    <partial name="_EventCard" model="ev" />
+                }
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Pagination" class="flex items-center justify-between gap-4 pt-2">
+                    @if (Model.Page > 1)
+                    {
+                        <a asp-controller="Events" asp-action="Index" asp-all-route-data="@RouteFor(Model.Page - 1)" rel="prev" class="@pageBtn @ring">
+                            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_left</span>Previous
+                        </a>
+                    }
+                    else { <span></span> }
+
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">Page @Model.Page of @Model.TotalPages</span>
+
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <a asp-controller="Events" asp-action="Index" asp-all-route-data="@RouteFor(Model.Page + 1)" rel="next" class="@pageBtn @ring">
+                            Next<span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_right</span>
+                        </a>
+                    }
+                    else { <span></span> }
+                </nav>
+            }
+        }
+    </section>
+
+    @if (Model.OtherRegionEvents.Count > 0)
+    {
+        <section aria-labelledby="beyond-heading" class="flex flex-col gap-4">
+            <h2 id="beyond-heading" class="@h2">Explore beyond @(string.IsNullOrWhiteSpace(f.Region) ? "your city" : regionLabel)</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                @foreach (var ev in Model.OtherRegionEvents.Take(4))
+                {
+                    <partial name="_EventCard" model="ev" />
+                }
+            </div>
+        </section>
+    }
+</div>

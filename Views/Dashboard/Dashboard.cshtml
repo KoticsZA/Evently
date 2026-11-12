@@ -12,145 +12,77 @@
 
     var next = Model.NextEvent;
     var activity = Model.UpcomingEvents.OrderByDescending(b => b.BookingDate).Take(4).ToList();
+
+    // Shared style tokens for this view (all colours come from the Tailwind theme, no hex values)
+    const string ring    = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+    const string card    = "rounded-xl border border-outline-variant bg-surface-container-low";
+    const string h2      = "font-headline-sm text-headline-sm text-on-surface";
+    const string textLink = "inline-flex items-center gap-1 font-label-lg text-label-lg text-secondary hover:text-primary transition-colors rounded";
 }
 
-<div class="relative w-full max-w-[1400px] mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin py-8 flex flex-col gap-10">
+<div class="w-full max-w-[1200px] mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin py-10 flex flex-col gap-12">
 
-    <!-- 1. WELCOME & DISCOVERY HEADER -->
-    <header class="flex flex-col gap-6 pt-2">
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2 mb-1.5">
-                    <span class="inline-block w-2 h-2 rounded-full bg-secondary"></span>
-                    <span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-semibold">Attendee Desk</span>
-                </div>
-                <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-[#faf9fd] tracking-tight">
-                    @UiFormat.Greeting(DateTime.Now)@(string.IsNullOrWhiteSpace(Model.FirstName) ? "" : ", " + Model.FirstName).
-                </h1>
-                <p class="font-body-lg text-body-lg text-on-surface-variant mt-1">Your next great experience is closer than you think.</p>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <span class="font-body-sm text-body-sm text-[#8e92a4]">Local Edition:</span>
-                <div class="relative inline-block text-left">
-                    <button id="locationMenuBtn" type="button" aria-haspopup="true" aria-expanded="false"
-                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container border border-[#222530] text-[#faf9fd] font-title-md text-title-md hover:bg-surface-container-high transition-colors">
-                        <span class="material-symbols-outlined text-[18px] text-secondary">explore</span>
-                        <span id="currentLocationLabel">Western Cape • Cape Town</span>
-                        <span class="material-symbols-outlined text-[16px] text-on-surface-variant">keyboard_arrow_down</span>
-                    </button>
-                    <div id="locationDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-xl bg-surface-container-low border border-[#222530] shadow-2xl py-2 z-30">
-                        @foreach (var loc in new[] { "Western Cape • Cape Town", "Gauteng • Johannesburg", "KwaZulu-Natal • Durban", "Gauteng • Pretoria" })
-                        {
-                            <button type="button" data-location="@loc"
-                                    class="w-full text-left px-4 py-2 font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container hover:text-[#faf9fd]">@loc.Split(" • ")[1]</button>
-                        }
-                    </div>
-                </div>
-            </div>
+    <!-- 1. GREETING + SEARCH -->
+    <header class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface tracking-tight">
+                @UiFormat.Greeting(DateTime.Now)@(string.IsNullOrWhiteSpace(Model.FirstName) ? "" : ", " + Model.FirstName)
+            </h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant mt-1">Your next great experience is closer than you think.</p>
         </div>
 
-        <!-- Discovery filter bar (GET to Events/Index) -->
-        <form method="get" asp-controller="Events" asp-action="Index"
-              class="p-2 rounded-2xl bg-surface-container-low border border-[#222530] shadow-lg flex flex-col lg:flex-row items-stretch lg:items-center gap-2">
-            <div class="flex-1 flex items-center px-4 py-3 gap-3">
-                <span class="material-symbols-outlined text-secondary text-[22px]">search</span>
-                <input id="eventSearch" name="q" type="text" aria-label="Event search"
-                       placeholder="Search by artist, event title, or venue..."
-                       class="w-full bg-transparent border-0 p-0 text-[#faf9fd] placeholder:text-[#63687b] focus:ring-0 font-body-md text-body-md focus:outline-none" />
+        <form method="get" asp-controller="Events" asp-action="Index" role="search" class="w-full md:max-w-sm">
+            <label for="eventSearch" class="sr-only">Search events</label>
+            <div class="flex items-center gap-2 h-12 pl-4 pr-1.5 rounded-lg bg-surface-container-low border border-outline-variant focus-within:border-secondary transition-colors">
+                <span class="material-symbols-outlined text-[20px] text-on-surface-variant" aria-hidden="true">search</span>
+                <input id="eventSearch" name="q" type="search" autocomplete="off"
+                       placeholder="Search artists, events or venues"
+                       class="flex-1 min-w-0 bg-transparent border-0 p-0 text-on-surface placeholder:text-on-surface-variant focus:ring-0 focus:outline-none font-body-md text-body-md" />
+                <button type="submit" class="h-9 px-4 rounded-lg bg-secondary text-on-secondary-container font-label-lg text-label-lg hover:bg-primary transition-colors cursor-pointer @ring">Search</button>
             </div>
-            <div class="h-8 w-px bg-[#222530] hidden lg:block"></div>
-            <div class="flex items-center px-3 py-2 gap-2 lg:min-w-[210px] bg-surface-container rounded-xl border border-[#222530]/80">
-                <span class="material-symbols-outlined text-secondary text-[20px]">category</span>
-                <select name="category" aria-label="Select Category"
-                        class="w-full bg-transparent border-0 text-[#faf9fd] font-body-sm text-body-sm focus:ring-0 focus:outline-none cursor-pointer py-1">
-                    <option class="bg-surface-container text-[#faf9fd]" value="">All Categories</option>
-                    <option class="bg-surface-container text-[#faf9fd]" value="music">Live Music &amp; Orchestral</option>
-                    <option class="bg-surface-container text-[#faf9fd]" value="wine">Culinary &amp; Pinotage</option>
-                    <option class="bg-surface-container text-[#faf9fd]" value="arts">Fine Arts &amp; Theater</option>
-                    <option class="bg-surface-container text-[#faf9fd]" value="tech">Tech &amp; Creative Ventures</option>
-                </select>
-            </div>
-            <div class="flex items-center px-3 py-2 gap-2 lg:min-w-[190px] bg-surface-container rounded-xl border border-[#222530]/80">
-                <span class="material-symbols-outlined text-secondary text-[20px]">calendar_month</span>
-                <select name="when" aria-label="Select Date Range"
-                        class="w-full bg-transparent border-0 text-[#faf9fd] font-body-sm text-body-sm focus:ring-0 focus:outline-none cursor-pointer py-1">
-                    <option class="bg-surface-container text-[#faf9fd]" value="">Any Upcoming Date</option>
-                    <option class="bg-surface-container text-[#faf9fd]" value="weekend">This Weekend</option>
-                    <option class="bg-surface-container text-[#faf9fd]" value="month">This Month</option>
-                    <option class="bg-surface-container text-[#faf9fd]" value="quarter">Next 3 Months</option>
-                </select>
-            </div>
-            <button type="submit"
-                    class="px-6 py-3 rounded-xl bg-secondary text-[#0c0e14] font-title-md text-title-md font-bold hover:bg-[#ffc665] transition-all flex items-center justify-center gap-2 shrink-0 shadow-md shadow-secondary/10 cursor-pointer">
-                <span>Explore</span>
-                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-            </button>
         </form>
     </header>
 
-    <!-- 2. ACTIVITY OVERVIEW -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4" aria-label="Activity overview">
-        <div class="bg-surface-container-low border border-[#222530] p-5 rounded-2xl flex items-center justify-between shadow-sm">
-            <div>
-                <span class="font-label-md text-label-md text-[#8e92a4] uppercase tracking-wider block mb-1">Confirmed Passes</span>
-                <div class="flex items-baseline gap-2">
-                    <span class="font-headline-lg text-headline-lg text-[#faf9fd]">@Model.TotalBookings</span>
-                    <span class="font-body-sm text-body-sm text-on-surface-variant">@(Model.TotalBookings == 1 ? "Booking" : "Bookings")</span>
-                </div>
-            </div>
-            <a asp-controller="Bookings" asp-action="Index" class="flex items-center gap-1 font-label-md text-label-md text-secondary hover:text-[#ffc665] group">
-                <span>All bookings</span>
-                <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-            </a>
-        </div>
-
-        <div class="bg-surface-container-low border border-[#222530] p-5 rounded-2xl flex items-center justify-between shadow-sm">
-            <div>
-                <span class="font-label-md text-label-md text-[#8e92a4] uppercase tracking-wider block mb-1">Immediate Itinerary</span>
-                <div class="flex items-baseline gap-2">
-                    <span class="font-headline-lg text-headline-lg text-[#faf9fd]">@Model.UpcomingEventsCount</span>
-                    <span class="font-body-sm text-body-sm text-on-surface-variant">Upcoming @(Model.UpcomingEventsCount == 1 ? "event" : "events")</span>
-                </div>
-            </div>
-            @if (next is not null)
-            {
-                <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/15 border border-secondary/40 text-secondary font-label-sm text-label-sm font-semibold">
-                    <span class="material-symbols-outlined text-[14px]">schedule</span>
-                    <span>@UiFormat.ShortDate(next.EventStartDateTime)</span>
-                </div>
-            }
-        </div>
-
-        <div class="bg-surface-container-low border border-[#222530] p-5 rounded-2xl flex items-center justify-between shadow-sm">
-            <div>
-                <span class="font-label-md text-label-md text-[#8e92a4] uppercase tracking-wider block mb-1">Curated Wishlist</span>
-                <div class="flex items-baseline gap-2">
-                    <span class="font-headline-lg text-headline-lg text-[#faf9fd]">@Model.SavedEventsCount</span>
-                    <span class="font-body-sm text-body-sm text-on-surface-variant">Saved experiences</span>
-                </div>
-            </div>
-            <a href="#saved" class="flex items-center gap-1 font-label-md text-label-md text-secondary hover:text-[#ffc665] group">
-                <span>View saved</span>
-                <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-            </a>
-        </div>
+    <!-- 2. SUMMARY STRIP -->
+    <section aria-label="Summary" class="grid grid-cols-3 divide-x divide-outline-variant overflow-hidden @card">
+        <a asp-controller="Bookings" asp-action="Index" class="px-4 sm:px-6 py-5 hover:bg-surface-container transition-colors @ring">
+            <p class="font-headline-md text-headline-md text-on-surface">@Model.TotalBookings</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">@(Model.TotalBookings == 1 ? "Booking" : "Bookings")</p>
+        </a>
+        <a asp-controller="Bookings" asp-action="Index" class="px-4 sm:px-6 py-5 hover:bg-surface-container transition-colors @ring">
+            <p class="font-headline-md text-headline-md text-on-surface">@Model.UpcomingEventsCount</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">
+                Upcoming@(next is not null ? " · next " + UiFormat.ShortDate(next.EventStartDateTime) : "")
+            </p>
+        </a>
+        <a href="#saved" class="px-4 sm:px-6 py-5 hover:bg-surface-container transition-colors @ring">
+            <p class="font-headline-md text-headline-md text-on-surface">@Model.SavedEventsCount</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Saved</p>
+        </a>
     </section>
 
     <!-- 3. NEXT EVENT -->
-    <section class="flex flex-col gap-3" aria-label="Your next event">
+    <section aria-labelledby="next-heading" class="flex flex-col gap-4">
+        <div class="flex items-center justify-between gap-4">
+            <h2 id="next-heading" class="@h2">Your next event</h2>
+            @if (next is not null)
+            {
+                <a asp-controller="Bookings" asp-action="Index" class="@textLink @ring">All bookings</a>
+            }
+        </div>
+
         @if (next is null)
         {
-            <div class="bg-surface-container-low rounded-2xl border border-[#222530] shadow-xl p-10 flex flex-col items-center text-center gap-4">
-                <div class="w-14 h-14 rounded-full bg-secondary/10 border border-secondary/30 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-secondary text-[28px]">confirmation_number</span>
+            <div class="@card px-6 py-12 flex flex-col items-center text-center gap-4">
+                <span class="material-symbols-outlined text-[32px] text-secondary" aria-hidden="true">confirmation_number</span>
+                <div>
+                    <h3 class="font-title-md text-title-md text-on-surface">No upcoming events</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-sm">Once you book, your pass and entry QR code will show up here.</p>
                 </div>
-                <h2 class="font-headline-md text-headline-md text-[#faf9fd]">No upcoming passes yet</h2>
-                <p class="font-body-md text-body-md text-on-surface-variant max-w-md">When you book an experience, your digital pass and entry QR code will appear here.</p>
                 <a asp-controller="Events" asp-action="Index"
-                   class="px-6 py-3 rounded-xl bg-secondary text-[#0c0e14] font-title-md text-title-md font-bold hover:bg-[#ffc665] transition-all inline-flex items-center gap-2">
-                    <span>Discover events</span>
-                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                   class="h-11 px-6 rounded-lg bg-secondary text-on-secondary-container font-label-lg text-label-lg hover:bg-primary transition-colors inline-flex items-center gap-2 @ring">
+                    Discover events
+                    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
                 </a>
             </div>
         }
@@ -161,102 +93,88 @@
             var tiers = string.Join(", ", tickets.Select(t => t.TicketTypeName).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct());
             var where = string.IsNullOrWhiteSpace(next.City) ? next.VenueName : next.VenueName + ", " + next.City;
 
-            <div class="flex items-center justify-between flex-wrap gap-2">
-                <div class="flex items-center gap-2">
-                    <span class="font-label-sm text-label-sm uppercase tracking-widest text-[#8e92a4]">Your Next Digital Pass</span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                    <span class="font-label-sm text-label-sm text-secondary font-semibold">Instant Access Ready</span>
-                </div>
-                <span class="font-body-sm text-body-sm text-[#8e92a4]">Reference #@next.BookingReference</span>
-            </div>
-
-            <article class="bg-surface-container-low rounded-2xl overflow-hidden border border-[#222530] shadow-xl grid grid-cols-1 lg:grid-cols-12 relative">
-                <!-- Visual & context -->
-                <div class="lg:col-span-7 relative min-h-[380px] lg:min-h-[440px] flex flex-col justify-between p-6 sm:p-8 text-[#faf9fd] overflow-hidden">
+            <article class="grid grid-cols-1 lg:grid-cols-5 overflow-hidden @card">
+                <!-- Event -->
+                <div class="lg:col-span-3 relative min-h-[320px] lg:min-h-[400px] flex flex-col justify-between p-6 sm:p-8 overflow-hidden">
                     @if (!string.IsNullOrWhiteSpace(next.EventCoverImageUrl))
                     {
                         <img src="@next.EventCoverImageUrl" alt="" class="absolute inset-0 w-full h-full object-cover" />
                     }
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#0c0e14] via-[#0c0e14]/75 to-[#0c0e14]/40"></div>
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#0c0e14]/90 via-[#0c0e14]/50 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/70 to-surface-container-lowest/20"></div>
 
-                    <div class="relative z-10 flex flex-wrap items-center justify-between gap-2">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0c0e14]/70 backdrop-blur-md text-[#faf9fd] font-label-sm text-label-sm tracking-wider uppercase border border-white/10">
-                            <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                            <span>@next.BookingStatus • @next.TotalTickets @(next.TotalTickets == 1 ? "Pass" : "Passes")</span>
-                        </div>
-                        <div class="px-3 py-1 rounded-full bg-secondary text-[#0c0e14] font-label-sm text-label-sm font-bold shadow-sm">
+                    <div class="relative">
+                        <span class="inline-flex items-center h-7 px-3 rounded-full bg-secondary text-on-secondary-container font-label-md text-label-md">
                             @UiFormat.DaysUntil(next.EventStartDateTime)
-                        </div>
+                        </span>
                     </div>
 
-                    <div class="relative z-10 flex flex-col gap-3 mt-16">
-                        <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-[#faf9fd] leading-tight">@next.EventTitle</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-[#e2e2ea]/90 font-body-sm text-body-sm">
-                            <div class="flex items-start gap-2.5">
-                                <span class="material-symbols-outlined text-[20px] text-secondary shrink-0">pin_drop</span>
+                    <div class="relative flex flex-col gap-4">
+                        <h3 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface leading-tight">@next.EventTitle</h3>
+                        <ul class="flex flex-col gap-2 font-body-md text-body-md text-on-surface">
+                            <li class="flex items-start gap-2.5">
+                                <span class="material-symbols-outlined text-[20px] text-secondary shrink-0" aria-hidden="true">calendar_today</span>
+                                <span>@UiFormat.LongDay(next.EventStartDateTime) · @UiFormat.Time(next.EventStartDateTime)@(next.EventEndDateTime > next.EventStartDateTime ? " – " + UiFormat.Time(next.EventEndDateTime) : "")</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="material-symbols-outlined text-[20px] text-secondary shrink-0" aria-hidden="true">location_on</span>
                                 <span>@where</span>
-                            </div>
-                            <div class="flex items-start gap-2.5">
-                                <span class="material-symbols-outlined text-[20px] text-secondary shrink-0">schedule</span>
-                                <span>@UiFormat.LongDay(next.EventStartDateTime) • @UiFormat.Time(next.EventStartDateTime)@(next.EventEndDateTime > next.EventStartDateTime ? " – " + UiFormat.Time(next.EventEndDateTime) : "")</span>
-                            </div>
-                        </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
-                <!-- Ticket stub -->
-                <div class="lg:col-span-5 p-6 sm:p-8 bg-surface-container-lowest border-t lg:border-t-0 lg:border-l border-[#222530] flex flex-col justify-between relative">
-                    <div class="hidden lg:block absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface border-r border-[#222530]"></div>
-
-                    <div class="flex flex-col gap-6">
-                        <div class="flex items-start justify-between gap-4 pb-4 border-b border-[#222530]">
-                            <div class="min-w-0">
-                                <span class="font-label-sm text-label-sm uppercase tracking-wider text-[#8e92a4] block">Admission Tier</span>
-                                <span class="font-title-md text-title-md text-[#faf9fd]">@(string.IsNullOrWhiteSpace(tiers) ? "General Admission" : tiers)</span>
-                            </div>
-                            <div class="text-right shrink-0">
-                                <span class="font-label-sm text-label-sm uppercase tracking-wider text-[#8e92a4] block">Passes</span>
-                                <span class="font-title-md text-title-md text-[#faf9fd]">@(next.TotalTickets)×</span>
-                            </div>
-                        </div>
-
-                        <div class="p-5 rounded-xl bg-white shadow-lg flex flex-col items-center justify-center gap-3 text-center border border-white/20">
-                            <div id="qrTarget" class="qr-box w-36 h-36 flex items-center justify-center text-[#0c0e14] font-label-sm text-label-sm break-all"
+                <!-- Pass -->
+                <div class="lg:col-span-2 p-6 sm:p-8 flex flex-col gap-6 border-t lg:border-t-0 lg:border-l border-outline-variant bg-surface-container-lowest">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="p-4 rounded-lg bg-white">
+                            <div id="qrTarget" class="qr-box w-36 h-36 flex items-center justify-center text-on-secondary-container font-label-md text-label-md break-all text-center"
                                  role="img" aria-label="Entry QR code" data-qr="@qrValue">@next.BookingReference</div>
-                            <div class="flex items-center gap-1.5 font-label-sm text-label-sm text-[#434845] tracking-wider uppercase font-semibold">
-                                <span class="material-symbols-outlined text-[16px] text-secondary-container">verified</span>
-                                <span id="qrCaption">@(tickets.Count > 0 ? "Pass " + tickets[0].TicketNumber : "Encrypted Live Token")</span>
-                            </div>
                         </div>
+                        <p id="qrCaption" class="font-body-sm text-body-sm text-on-surface-variant">@(tickets.Count > 0 ? "Pass " + tickets[0].TicketNumber : "Entry pass")</p>
 
                         @if (tickets.Count > 1)
                         {
-                            <div class="flex flex-wrap gap-2" role="group" aria-label="Select pass">
+                            <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="Choose a pass">
                                 @for (var i = 0; i < tickets.Count; i++)
                                 {
-                                    <button type="button" data-qr-select="@tickets[i].QRCodeValue" data-qr-label="Pass @tickets[i].TicketNumber"
-                                            class="px-3 py-1.5 rounded-lg border font-label-md text-label-md transition-colors cursor-pointer @(i == 0 ? "bg-secondary text-[#0c0e14] border-secondary" : "bg-surface-container text-[#faf9fd] border-[#222530] hover:bg-surface-container-high")">
-                                        @tickets[i].TicketTypeName #@(i + 1)
+                                    <button type="button" aria-pressed="@(i == 0 ? "true" : "false")"
+                                            data-qr-select="@tickets[i].QRCodeValue" data-qr-label="Pass @tickets[i].TicketNumber"
+                                            class="h-9 px-3 rounded-lg border border-outline-variant text-on-surface font-label-md text-label-md transition-colors cursor-pointer hover:bg-surface-container aria-pressed:bg-secondary aria-pressed:text-on-secondary-container aria-pressed:border-secondary @ring">
+                                        Pass @(i + 1)
                                     </button>
                                 }
                             </div>
                         }
                     </div>
 
-                    <div class="flex flex-col gap-3 pt-6">
+                    <dl class="divide-y divide-outline-variant font-body-sm text-body-sm">
+                        <div class="flex justify-between gap-4 py-2.5">
+                            <dt class="text-on-surface-variant">Reference</dt>
+                            <dd class="text-on-surface text-right">@next.BookingReference</dd>
+                        </div>
+                        <div class="flex justify-between gap-4 py-2.5">
+                            <dt class="text-on-surface-variant">Admission</dt>
+                            <dd class="text-on-surface text-right">@(string.IsNullOrWhiteSpace(tiers) ? "General" : tiers)</dd>
+                        </div>
+                        <div class="flex justify-between gap-4 py-2.5">
+                            <dt class="text-on-surface-variant">Passes</dt>
+                            <dd class="text-on-surface text-right">@next.TotalTickets</dd>
+                        </div>
+                    </dl>
+
+                    <div class="flex flex-col gap-2 mt-auto">
                         <a asp-controller="Bookings" asp-action="Details" asp-route-id="@next.TicketOrderId"
-                           class="w-full py-3.5 px-5 rounded-xl bg-secondary hover:bg-[#ffc665] text-[#0c0e14] font-title-md text-title-md font-bold transition-all shadow-md flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined text-[20px]">confirmation_number</span>
-                            <span>View digital ticket</span>
+                           class="h-11 rounded-lg bg-secondary text-on-secondary-container font-label-lg text-label-lg hover:bg-primary transition-colors flex items-center justify-center gap-2 @ring">
+                            View ticket
                         </a>
-                        <div class="flex items-center gap-2">
+                        <div class="grid grid-cols-2 gap-2">
                             <a href="@UiFormat.MapsUrl(where)" target="_blank" rel="noopener"
-                               class="flex-1 py-2.5 px-3 rounded-lg bg-surface-container hover:bg-surface-container-high border border-[#222530] text-[#faf9fd] font-label-md text-label-md transition-colors text-center">Directions &amp; Info</a>
+                               class="h-10 rounded-lg border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center justify-center gap-1.5 @ring">
+                                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">directions</span>Directions
+                            </a>
                             <a href="@UiFormat.GoogleCalendarUrl(next.EventTitle, next.EventStartDateTime, next.EventEndDateTime, where)" target="_blank" rel="noopener"
-                               title="Add to Google Calendar" aria-label="Add to Google Calendar"
-                               class="p-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-[#222530] text-[#faf9fd] transition-colors flex items-center">
-                                <span class="material-symbols-outlined text-[20px]">event</span>
+                               class="h-10 rounded-lg border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center justify-center gap-1.5 @ring">
+                                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">event</span>Add to calendar
                             </a>
                         </div>
                     </div>
@@ -265,18 +183,15 @@
         }
     </section>
 
-    <!-- 4. CURATED RECOMMENDATIONS -->
+    <!-- 4. RECOMMENDED -->
     @if (Model.RecommendedEvents.Count > 0)
     {
-        <section class="flex flex-col gap-6 pt-4" aria-label="Recommended events">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-                <div>
-                    <span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-semibold">Handpicked Access</span>
-                    <h2 class="font-headline-md text-headline-md text-[#faf9fd]">Curated for you</h2>
-                </div>
-                <a asp-controller="Events" asp-action="Index" class="inline-flex items-center gap-1 font-label-lg text-label-lg text-secondary hover:text-[#ffc665] group">
-                    <span>Explore all events</span>
-                    <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        <section aria-labelledby="rec-heading" class="flex flex-col gap-4">
+            <div class="flex items-center justify-between gap-4">
+                <h2 id="rec-heading" class="@h2">Recommended for you</h2>
+                <a asp-controller="Events" asp-action="Index" class="@textLink @ring">
+                    Browse all
+                    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
                 </a>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -288,20 +203,20 @@
         </section>
     }
 
-    <!-- 5. SAVED & ACTIVITY -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4 mb-8">
-        <div id="saved" class="lg:col-span-6 flex flex-col gap-4 scroll-mt-28">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[20px] text-secondary">bookmark</span>
-                    <h2 class="font-headline-sm text-headline-sm text-[#faf9fd]">Saved for later</h2>
-                </div>
-                <a asp-controller="Events" asp-action="Saved" class="font-label-sm text-label-sm text-secondary uppercase tracking-wider hover:text-[#ffc665]">Manage All (@Model.SavedEventsCount)</a>
+    <!-- 5. SAVED + RECENT BOOKINGS -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div id="saved" aria-labelledby="saved-heading" class="flex flex-col gap-4 scroll-mt-28">
+            <div class="flex items-center justify-between gap-4">
+                <h2 id="saved-heading" class="@h2">Saved for later</h2>
+                @if (Model.SavedEventsCount > 0)
+                {
+                    <a asp-controller="Events" asp-action="Saved" class="@textLink @ring">Manage all</a>
+                }
             </div>
             <div class="flex flex-col gap-3">
                 @if (Model.SavedEvents.Count == 0)
                 {
-                    <div class="p-6 rounded-xl bg-surface-container-low border border-dashed border-[#222530] text-center font-body-sm text-body-sm text-[#8e92a4]">
+                    <div class="rounded-xl border border-dashed border-outline-variant px-6 py-8 text-center font-body-md text-body-md text-on-surface-variant">
                         Nothing saved yet. Tap the bookmark on any event to keep it here.
                     </div>
                 }
@@ -315,56 +230,45 @@
             </div>
         </div>
 
-        <div class="lg:col-span-6 flex flex-col gap-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[20px] text-secondary">history</span>
-                    <h2 class="font-headline-sm text-headline-sm text-[#faf9fd]">Recent patron activity</h2>
-                </div>
-                <span class="font-label-sm text-label-sm text-[#8e92a4]">Real-Time Ledger</span>
+        <div aria-labelledby="activity-heading" class="flex flex-col gap-4">
+            <div class="flex items-center justify-between gap-4">
+                <h2 id="activity-heading" class="@h2">Recent bookings</h2>
+                @if (activity.Count > 0)
+                {
+                    <a asp-controller="Bookings" asp-action="Index" class="@textLink @ring">View all</a>
+                }
             </div>
 
-            <div class="p-5 rounded-2xl bg-surface-container-low border border-[#222530] shadow-sm flex flex-col justify-between">
-                @if (activity.Count == 0)
-                {
-                    <p class="font-body-sm text-body-sm text-[#8e92a4] text-center py-6">Your booking activity will appear here.</p>
-                }
-                else
-                {
-                    <div class="flex flex-col gap-4">
-                        @for (var i = 0; i < activity.Count; i++)
-                        {
-                            var b = activity[i];
-                            var paid = string.Equals(b.PaymentStatus, "Paid", StringComparison.OrdinalIgnoreCase);
-                            if (i > 0)
-                            {
-                                <div class="w-full h-px bg-[#222530]"></div>
-                            }
-                            <div class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border @(paid ? "bg-secondary/20 border-secondary/40 text-secondary" : "bg-surface-container border-[#222530] text-[#8e92a4]")">
-                                    <span class="material-symbols-outlined text-[16px]">@(paid ? "qr_code_2" : "schedule")</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-baseline justify-between gap-2">
-                                        <p class="font-body-md text-body-md text-[#faf9fd] font-semibold truncate">@b.EventTitle</p>
-                                        <span class="font-label-sm text-label-sm text-[#8e92a4] shrink-0">@UiFormat.Ago(b.BookingDate)</span>
-                                    </div>
-                                    <p class="font-body-sm text-body-sm text-on-surface-variant">
-                                        @b.TotalTickets @(b.TotalTickets == 1 ? "pass" : "passes") • @UiFormat.Rand(b.TotalAmount) • Payment @b.PaymentStatus.ToLowerInvariant() • Ref @b.BookingReference
-                                    </p>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-                <div class="pt-5 mt-2 flex items-center justify-between gap-2 flex-wrap">
-                    <a asp-controller="Bookings" asp-action="Index" class="font-label-md text-label-md text-secondary hover:text-[#ffc665] flex items-center gap-1 group">
-                        <span>View complete transaction history</span>
-                        <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                    </a>
-                    <span class="font-label-sm text-label-sm text-[#8e92a4]">South African VAT inclusive</span>
+            @if (activity.Count == 0)
+            {
+                <div class="rounded-xl border border-dashed border-outline-variant px-6 py-8 text-center font-body-md text-body-md text-on-surface-variant">
+                    Your bookings will appear here.
                 </div>
-            </div>
+            }
+            else
+            {
+                <ul class="@card divide-y divide-outline-variant overflow-hidden">
+                    @foreach (var b in activity)
+                    {
+                        var paid = string.Equals(b.PaymentStatus, "Paid", StringComparison.OrdinalIgnoreCase);
+                        <li>
+                            <a asp-controller="Bookings" asp-action="Details" asp-route-id="@b.TicketOrderId"
+                               class="flex items-center gap-4 px-4 py-3.5 hover:bg-surface-container transition-colors @ring">
+                                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 @(paid ? "bg-secondary/15 text-secondary" : "bg-surface-container text-on-surface-variant")">
+                                    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">@(paid ? "check_circle" : "schedule")</span>
+                                </span>
+                                <span class="flex-1 min-w-0">
+                                    <span class="block font-title-md text-title-md text-on-surface truncate">@b.EventTitle</span>
+                                    <span class="block font-body-sm text-body-sm text-on-surface-variant truncate">
+                                        @b.TotalTickets @(b.TotalTickets == 1 ? "pass" : "passes") · @UiFormat.Rand(b.TotalAmount) · @b.PaymentStatus
+                                    </span>
+                                </span>
+                                <span class="font-body-sm text-body-sm text-on-surface-variant shrink-0">@UiFormat.Ago(b.BookingDate)</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
         </div>
     </section>
 </div>

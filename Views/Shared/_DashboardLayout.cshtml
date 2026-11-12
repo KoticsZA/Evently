@@ -5,10 +5,9 @@
     var active = ViewData["ActiveNav"] as string ?? "";
     var ticketBadge = ViewData["TicketBadge"] as int? ?? 0;
 
-    // TODO: point these at your real controllers/actions. Url.Action returns null when a route doesn't exist, so "#" is the fallback.
     var primaryNav = new[]
     {
-        (Key: "overview", Icon: "space_dashboard",       Label: "Overview",        Href: Url.Action("Dashboard", "Account") ?? "#"),
+        (Key: "overview", Icon: "space_dashboard",       Label: "Overview",        Href: Url.Action("Dashboard", "Dashboard") ?? "#"),
         (Key: "discover", Icon: "explore",               Label: "Discover events", Href: Url.Action("Index", "Events") ?? "#"),
         (Key: "tickets",  Icon: "confirmation_number",   Label: "My tickets",      Href: Url.Action("Index", "Bookings") ?? "#"),
         (Key: "bookings", Icon: "event_seat",            Label: "My bookings",     Href: Url.Action("Index", "Bookings") ?? "#"),

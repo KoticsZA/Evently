@@ -20,6 +20,7 @@ namespace Evently.Data
         public DbSet<Event> Events { get; set; }
 
         public DbSet<OrganizerEvent> OrganizerEvents { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         public DbSet<TicketType> TicketTypes { get; set; }
 

@@ -33,13 +33,23 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserDashboardService, UserDashboardService>();
+builder.Services.AddScoped<IEventService, EventService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-await RoleSeeder.SeedAsync(app.Services);
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider
+        .GetRequiredService<EventlyDBContext>();
+
+    await CategorySeeder.SeedAsync(context);
+
+    await RoleSeeder.SeedAsync(app.Services);
+}
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
