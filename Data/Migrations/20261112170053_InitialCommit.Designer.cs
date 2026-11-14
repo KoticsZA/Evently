@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evently.Data.Migrations
 {
     [DbContext(typeof(EventlyDBContext))]
-    [Migration("20261112135240_FixedTicketOrdersAndOrganizerEventRelationship")]
-    partial class FixedTicketOrdersAndOrganizerEventRelationship
+    [Migration("20261112170053_InitialCommit")]
+    partial class InitialCommit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

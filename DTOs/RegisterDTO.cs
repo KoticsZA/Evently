@@ -28,5 +28,7 @@ namespace Evently.DTOs
         [Required]
         [Compare(nameof(Password))]
         public string ConfirmPassword { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string Province { get; set; } = string.Empty;
     }
 }

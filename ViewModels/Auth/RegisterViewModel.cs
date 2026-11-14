@@ -25,6 +25,13 @@ namespace Evently.ViewModels.Auth
 
         [StringLength(30)]
         public string? Gender { get; set; }
+        [Required(ErrorMessage = "City is required.")]
+        [StringLength(100)]
+        public string City { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Province is required.")]
+        [StringLength(100)]
+        public string Province { get; set; } 
 
         [Required(ErrorMessage = "Password is required.")]
         [StringLength(100, MinimumLength = 8,

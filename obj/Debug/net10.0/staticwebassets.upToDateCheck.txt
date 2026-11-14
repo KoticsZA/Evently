@@ -1,6 +1,7 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\js\dashboard.js
+wwwroot\js\event-create.js
 wwwroot\js\Register.js
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
@@ -63,7 +64,9 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
-C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\dist\jquery.slim.js
+wwwroot\uploads\events\9da133193ac2423c8850cff916c4d099.jpg
+wwwroot\js\location-select.js
+C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\LICENSE.txt
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\dist\jquery.min.map
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\dist\jquery.min.js
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\dist\jquery.js
@@ -121,9 +124,11 @@ C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\bootstrap\dist\css\boot
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\js\site.js
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\js\Register.js
+C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\js\event-create.js
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\js\dashboard.js
-C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\dist\jquery.slim.min.js
+C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\dist\jquery.slim.js
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\favicon.ico
+C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\dist\jquery.slim.min.js
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\dist\jquery.slim.min.map
-C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\lib\jquery\LICENSE.txt
 C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\css\site.css
+C:\Users\Unakho\source\repos\Evently\Evently\wwwroot\js\location-select.js

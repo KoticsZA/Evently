@@ -1,0 +1,275 @@
+﻿@using Evently.ViewModels.Events
+@model CreateEventViewModel
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Create an event";
+    ViewData["NavSet"] = "organizer";
+    ViewData["ActiveNav"] = "create";
+
+    var country = string.IsNullOrWhiteSpace(Model.Country) ? "South Africa" : Model.Country;
+
+    const string ring  = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+    const string card  = "rounded-xl border border-outline-variant bg-surface-container-low";
+    const string input = "w-full bg-surface text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/70 rounded-lg border border-outline-variant px-4 py-3 focus:outline-none focus:border-secondary transition-colors";
+    const string label = "font-label-lg text-label-lg text-on-surface";
+    const string hint  = "font-body-sm text-body-sm text-on-surface-variant";
+    const string err   = "font-body-sm text-body-sm text-error";
+    string[] provinces = { "Western Cape", "Gauteng", "KwaZulu-Natal", "Eastern Cape", "Free State", "Mpumalanga", "Limpopo", "North West", "Northern Cape" };
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/event-create.js" asp-append-version="true"></script>
+}
+
+<div class="w-full max-w-[1200px] mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin py-10 flex flex-col gap-8">
+
+    <!-- Header -->
+    <header class="flex flex-col gap-1">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant">
+            <a asp-controller="Organizer" asp-action="Dashboard" class="hover:text-on-surface transition-colors rounded @ring">Workspace</a>
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_right</span>
+            <span class="text-on-surface" aria-current="page">Create an event</span>
+        </nav>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface tracking-tight mt-1">Create an event</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+            Enter your core event details below. Your event is saved as an unpublished draft, and you can set up tickets and publish afterwards.
+        </p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- FORM -->
+        <form id="create-event-form" asp-action="Create" method="post" enctype="multipart/form-data" novalidate
+              class="lg:col-span-8 flex flex-col gap-8">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="rounded-lg bg-error-container/30 border border-error/30 text-error font-label-md text-label-md px-4 py-3" role="alert"></div>
+
+            <!-- 01 Event information -->
+            <section class="@card p-6 flex flex-col gap-6" aria-labelledby="sec-info">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary font-label-md text-label-md" aria-hidden="true">01</span>
+                    <div>
+                        <h2 id="sec-info" class="font-headline-sm text-headline-sm text-on-surface">Event information</h2>
+                        <p class="@hint">Title, category and what attendees can expect.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between">
+                        <label asp-for="Title" class="@label">Event title <span class="text-secondary">*</span></label>
+                        <span id="title-count" class="font-body-sm text-body-sm text-on-surface-variant" aria-hidden="true">0 / 120</span>
+                    </div>
+                    <input asp-for="Title" maxlength="120" placeholder="e.g. Cape Town Twilight Wine &amp; Symphony Gala" class="@input" />
+                    <span asp-validation-for="Title" class="@err"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="CategoryId" class="@label">Primary category <span class="text-secondary">*</span></label>
+                    <div class="relative">
+                        <select asp-for="CategoryId" asp-items="Model.Categories" class="@input appearance-none cursor-pointer pr-10 [color-scheme:dark]">
+                            <option value="">Select a category</option>
+                        </select>
+                        <span class="material-symbols-outlined pointer-events-none absolute right-3 top-3 text-on-surface-variant text-[20px]" aria-hidden="true">expand_more</span>
+                    </div>
+                    <span asp-validation-for="CategoryId" class="@err"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between">
+                        <label asp-for="Description" class="@label">Event description <span class="text-secondary">*</span></label>
+                        <span id="desc-count" class="font-body-sm text-body-sm text-on-surface-variant" aria-live="polite">Min. 50 characters</span>
+                    </div>
+                    <textarea asp-for="Description" rows="6" class="@input resize-y"
+                              placeholder="Describe what attendees can expect: line-up, schedule notes, dress code…"></textarea>
+                    <span asp-validation-for="Description" class="@err"></span>
+                </div>
+
+                <!-- Cover image (upload + preview) -->
+                <div class="flex flex-col gap-2" id="cover-field">
+                    <label for="CoverImage" class="@label">Cover image <span class="text-on-surface-variant font-normal">(optional)</span></label>
+
+                    <label id="cover-dropzone"
+                           class="flex items-center gap-4 rounded-lg border border-dashed border-outline-variant bg-surface px-4 py-5 cursor-pointer hover:border-secondary focus-within:ring-2 focus-within:ring-secondary focus-within:ring-offset-2 focus-within:ring-offset-surface transition-colors">
+                        <input asp-for="CoverImage" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" />
+                        <span class="w-11 h-11 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+                            <span class="material-symbols-outlined text-[24px]" aria-hidden="true">upload</span>
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block font-label-lg text-label-lg"><span class="text-secondary">Choose an image</span> <span class="text-on-surface-variant font-normal">or drag it here</span></span>
+                            <span class="block @hint">JPG, PNG or WebP · 16:9 recommended (1920×1080) · up to 4 MB</span>
+                        </span>
+                    </label>
+
+                    <p id="cover-error" class="hidden @err items-center gap-1" role="alert"></p>
+                    <span asp-validation-for="CoverImage" class="@err"></span>
+
+                    <!-- Preview, shown below the upload message once a file is chosen -->
+                    <figure id="cover-preview" class="hidden flex-col gap-2 m-0">
+                        <div class="relative aspect-video w-full overflow-hidden rounded-lg bg-surface border border-outline-variant">
+                            <img id="cover-preview-img" alt="Preview of your selected cover image" class="w-full h-full object-cover" />
+                        </div>
+                        <figcaption class="flex items-center justify-between gap-3">
+                            <span id="cover-meta" class="@hint truncate"></span>
+                            <button type="button" id="cover-remove"
+                                    class="shrink-0 h-9 px-3 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors cursor-pointer @ring">
+                                Remove
+                            </button>
+                        </figcaption>
+                    </figure>
+                </div>
+            </section>
+
+            <!-- 02 Location -->
+            <section class="@card p-6 flex flex-col gap-6" aria-labelledby="sec-loc">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary font-label-md text-label-md" aria-hidden="true">02</span>
+                    <div>
+                        <h2 id="sec-loc" class="font-headline-sm text-headline-sm text-on-surface">Location &amp; venue</h2>
+                        <p class="@hint">The physical estate, hall or outdoor precinct.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="VenueName" class="@label">Venue name <span class="text-secondary">*</span></label>
+                    <input asp-for="VenueName" placeholder="e.g. Groot Constantia Wine Estate" class="@input" />
+                    <span asp-validation-for="VenueName" class="@err"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="StreetAddress" class="@label">Street address <span class="text-secondary">*</span></label>
+                    <input asp-for="StreetAddress" autocomplete="street-address" placeholder="e.g. Groot Constantia Rd, Constantia" class="@input" />
+                    <span asp-validation-for="StreetAddress" class="@err"></span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="City" class="@label">City <span class="text-secondary">*</span></label>
+                        <input asp-for="City" placeholder="e.g. Cape Town" class="@input" />
+                        <span asp-validation-for="City" class="@err"></span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="Province" class="@label">Province <span class="text-secondary">*</span></label>
+                        <div class="relative">
+                            <select asp-for="Province" class="@input appearance-none cursor-pointer pr-10 [color-scheme:dark]">
+                                <option value="">Select</option>
+                                @foreach (var p in provinces)
+                                {
+                                    <option value="@p" selected="@(Model.Province == p)">@p</option>
+                                }
+                            </select>
+                            <span class="material-symbols-outlined pointer-events-none absolute right-3 top-3 text-on-surface-variant text-[20px]" aria-hidden="true">expand_more</span>
+                        </div>
+                        <span asp-validation-for="Province" class="@err"></span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label for="Country" class="@label">Country</label>
+                        <div class="relative">
+                            <input id="Country" name="Country" value="@country" readonly
+                                   class="w-full bg-surface-container text-on-surface-variant font-body-md text-body-md rounded-lg border border-outline-variant px-4 py-3 cursor-not-allowed" />
+                            <span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant text-[18px]" aria-hidden="true">lock</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 03 Schedule -->
+            <section class="@card p-6 flex flex-col gap-6" aria-labelledby="sec-time">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary font-label-md text-label-md" aria-hidden="true">03</span>
+                    <div>
+                        <h2 id="sec-time" class="font-headline-sm text-headline-sm text-on-surface">Schedule &amp; timing</h2>
+                        <p class="@hint">Doors opening and conclusion, in South Africa Standard Time (SAST).</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="StartDate" class="@label">Event starts <span class="text-secondary">*</span></label>
+                        <input asp-for="StartDate" class="@input [color-scheme:dark]" />
+                        <span asp-validation-for="StartDate" class="@err"></span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex items-center justify-between">
+                            <label asp-for="EndDate" class="@label">Event concludes <span class="text-secondary">*</span></label>
+                            <span id="duration-badge" class="hidden font-label-md text-label-md text-secondary"></span>
+                        </div>
+                        <input asp-for="EndDate" class="@input [color-scheme:dark]" />
+                        <span asp-validation-for="EndDate" class="@err"></span>
+                        <p id="date-error" class="hidden @err" role="alert">The end must be later than the start.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Actions -->
+            <div class="sticky bottom-4 z-20 rounded-xl border border-outline-variant bg-surface-container-high/95 backdrop-blur-md p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="@hint text-center sm:text-left">Saved as a draft. You'll set up tickets in the next step.</p>
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                    <a asp-controller="Organizer" asp-action="Dashboard"
+                       class="h-11 px-4 inline-flex items-center rounded-lg text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg transition-colors @ring">Cancel</a>
+                    <button id="submit-btn" type="submit"
+                            class="h-11 px-6 rounded-lg bg-secondary text-on-secondary-container font-label-lg text-label-lg hover:bg-primary transition-colors inline-flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-wait @ring">
+                        <span id="btn-text">Create event</span>
+                        <span id="btn-icon" class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                        <span id="btn-spinner" class="hidden material-symbols-outlined text-[18px] animate-spin" aria-hidden="true">progress_activity</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- SIDEBAR: live preview + progress -->
+        <aside class="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-28" aria-label="Preview and progress">
+            <div class="@card p-4 flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-label-lg text-label-lg text-on-surface">How attendees will see it</h2>
+                    <span class="px-2 h-6 inline-flex items-center rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Draft</span>
+                </div>
+
+                <div class="rounded-xl overflow-hidden border border-outline-variant bg-surface-container flex flex-col">
+                    <div class="relative aspect-[16/10] w-full overflow-hidden bg-surface-container-high">
+                        <img id="pv-img" alt="" class="hidden w-full h-full object-cover" />
+                        <div id="pv-img-empty" class="w-full h-full flex items-center justify-center text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[36px]" aria-hidden="true">image</span>
+                        </div>
+                        <span id="pv-category" class="hidden absolute top-2 left-2 h-7 px-3 items-center rounded-full bg-surface-container-lowest/85 backdrop-blur-md text-on-surface font-label-md text-label-md"></span>
+                    </div>
+                    <div class="p-4 flex flex-col gap-1">
+                        <p id="pv-date" class="font-label-md text-label-md text-secondary">Date to be set</p>
+                        <h3 id="pv-title" class="font-headline-md text-[22px] leading-tight text-on-surface line-clamp-2">Untitled event</h3>
+                        <p class="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant pt-1">
+                            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">location_on</span>
+                            <span id="pv-location" class="truncate">Venue to be set</span>
+                        </p>
+                    </div>
+                </div>
+                <p class="@hint text-center">Updates as you fill in the form.</p>
+            </div>
+
+            <div class="@card p-4 flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-label-lg text-label-lg text-on-surface">Launch progress</h2>
+                    <span id="progress-count" class="font-label-md text-label-md text-secondary">0 of 3 ready</span>
+                </div>
+                <ul class="flex flex-col gap-2" id="progress-list">
+                    <li data-step="info" class="flex items-center gap-3 rounded-lg bg-surface-container px-3 py-2.5">
+                        <span class="step-icon material-symbols-outlined text-[20px] text-on-surface-variant" aria-hidden="true">radio_button_unchecked</span>
+                        <span><span class="block font-label-lg text-label-lg text-on-surface">Basic info</span><span class="block @hint">Title, category and description</span></span>
+                    </li>
+                    <li data-step="venue" class="flex items-center gap-3 rounded-lg bg-surface-container px-3 py-2.5">
+                        <span class="step-icon material-symbols-outlined text-[20px] text-on-surface-variant" aria-hidden="true">radio_button_unchecked</span>
+                        <span><span class="block font-label-lg text-label-lg text-on-surface">Venue &amp; location</span><span class="block @hint">Venue, address, city and province</span></span>
+                    </li>
+                    <li data-step="time" class="flex items-center gap-3 rounded-lg bg-surface-container px-3 py-2.5">
+                        <span class="step-icon material-symbols-outlined text-[20px] text-on-surface-variant" aria-hidden="true">radio_button_unchecked</span>
+                        <span><span class="block font-label-lg text-label-lg text-on-surface">Date &amp; schedule</span><span class="block @hint">Start and end times</span></span>
+                    </li>
+                    <li class="flex items-center gap-3 rounded-lg bg-surface-container/50 px-3 py-2.5 opacity-70">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant" aria-hidden="true">radio_button_unchecked</span>
+                        <span><span class="block font-label-lg text-label-lg text-on-surface">Ticket tiers</span><span class="block @hint">Next step, after saving the draft</span></span>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+</div>

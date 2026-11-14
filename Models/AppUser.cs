@@ -16,7 +16,7 @@ namespace Evently.Models
 
         public Wallet? Wallet { get; set; }
         public string City { get; set; } = string.Empty;
-        public string Country { get; set; } = string.Empty;
+        public string Province { get; set; } = string.Empty;
 
         public ICollection<EventOrganizer> OrganizedProfiles { get; set; }
             = new List<EventOrganizer>();

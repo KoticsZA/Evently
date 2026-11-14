@@ -35,6 +35,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserDashboardService, UserDashboardService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IOrganizerDashboardService, OrganizerDashboardService>();
+builder.Services.AddScoped<IImageStorageService, LocalImageStorageService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

@@ -2,16 +2,15 @@
 using Evently.DTOs;
 using Evently.DTOs.OrganizerDashboard;
 using Evently.Interfaces;
+using Evently.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evently.Services
 {
     public class OrganizerDashboardService : IOrganizerDashboardService
     {
-        private const string PaidStatus = "Paid";
         private const int TrendDays = 30;
-
-        private readonly EventlyDBContext _context;      
+        private readonly EventlyDBContext _context;
 
         public OrganizerDashboardService(EventlyDBContext context)
         {
@@ -31,14 +30,18 @@ namespace Evently.Services
             var now = DateTime.UtcNow;
             var since = now.Date.AddDays(-(TrendDays - 1));
 
-            var orders = _context.TicketOrders.AsNoTracking()
-                .Where(o => o.OrganizerEvent.OrganizerId == orgId);
-
-            var paidOrders = orders.Where(o => o.Status == Models.OrderStatus.Paid);
-
+            // The organizer's events through the OrganizerEvent join
             var events = _context.OrganizerEvents.AsNoTracking()
-                .Where(e => e.OrganizerId == orgId);
+                .Where(oe => oe.OrganizerId == orgId)
+                .Select(oe => oe.Event);
 
+            // Keep orders as IQueryable to allow async database aggregations
+            var orders = _context.TicketOrders.AsNoTracking()
+                .Where(o => _context.OrganizerEvents.Any(oe => oe.OrganizerId == orgId && oe.Id == o.OrganizerEventId));
+
+            var paidOrders = orders.Where(o => o.Status == OrderStatus.Paid);
+
+            // 1. Totals (Executed in SQL)
             var totals = await paidOrders
                 .GroupBy(_ => 1)
                 .Select(g => new
@@ -49,6 +52,7 @@ namespace Evently.Services
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
+            // 2. Daily revenue, last 30 days (Executed in SQL, then brought to memory)
             var daily = await paidOrders
                 .Where(o => o.CreatedAt >= since)
                 .GroupBy(o => o.CreatedAt.Date)
@@ -61,34 +65,52 @@ namespace Evently.Services
                 .Select(day => new DailyRevenueDto { Date = day, Amount = byDay.GetValueOrDefault(day) })
                 .ToList();
 
+            // 3. Event counts + sell-through for upcoming events
             var totalEvents = await events.CountAsync(cancellationToken);
-            var upcomingCount = await events.CountAsync(e => e.Event.StartDate >= now, cancellationToken);
+            var upcomingCount = await events.CountAsync(e => e.EndDate >= now, cancellationToken);
 
-            var upcomingSales = await events
-                .Where(e => e.Event.StartDate >= now)
-                .OrderBy(e => e.Event.StartDate)
+            var upcoming = await _context.OrganizerEvents.AsNoTracking()
+                .Where(oe => oe.OrganizerId == orgId && oe.Event.EndDate >= now)
+                .OrderBy(oe => oe.Event.StartDate)
                 .Take(6)
-                .Select(e => new EventSalesDto
+                .Select(oe => new
                 {
-                    EventId = e.EventId,
-                    Title = e.Event.Title,
-                    StartDateTime = e.Event.StartDate,
-                    TicketsSold = e.TicketOrders
-                        .Where(o => o.Status == Models.OrderStatus.Paid)
-                        .Sum(o => (int?)o.Tickets.Count) ?? 0,
-                    Capacity = e.Event.TicketTypes.Sum(t => (int?)t.QuantityAvailable) ?? 0
+                    OrganizerEventId = oe.Id,
+                    EventId = oe.EventId,
+                    Title = oe.Event.Title,
+                    StartDate = oe.Event.StartDate,
+                    Capacity = oe.Event.TicketTypes.Sum(t => (int?)t.QuantityAvailable) ?? 0
                 })
                 .ToListAsync(cancellationToken);
 
+            var organizerEventIds = upcoming.Select(u => u.OrganizerEventId).ToList();
+
+            var soldByEvent = await paidOrders
+                .Where(o => organizerEventIds.Contains(o.OrganizerEventId))
+                .GroupBy(o => o.OrganizerEventId)
+                .Select(g => new { OrganizerEventId = g.Key, Sold = g.Sum(o => o.Tickets.Count) })
+                .ToDictionaryAsync(x => x.OrganizerEventId, x => x.Sold, cancellationToken);
+
+            var upcomingSales = upcoming.Select(u => new EventSalesDto
+            {
+                EventId = u.EventId,
+                Title = u.Title,
+                StartDateTime = u.StartDate,
+                TicketsSold = soldByEvent.GetValueOrDefault(u.OrganizerEventId),
+                Capacity = u.Capacity
+            }).ToList();
+
+            // 4. Ticket type mix
             var mix = await _context.Tickets.AsNoTracking()
-                .Where(t => t.TicketOrder.OrganizerEvent.OrganizerId == orgId
-                         && t.TicketOrder.Status == Models.OrderStatus.Paid)
+                .Where(t => t.TicketOrder.Status == OrderStatus.Paid
+                         && _context.OrganizerEvents.Any(oe => oe.OrganizerId == orgId && oe.Id == t.TicketOrder.OrganizerEventId))
                 .GroupBy(t => t.TicketType.Name)
                 .Select(g => new TicketTypeSalesDto { Name = g.Key, Sold = g.Count() })
                 .OrderByDescending(x => x.Sold)
                 .Take(5)
                 .ToListAsync(cancellationToken);
 
+            // 5. Recent orders
             var recent = await orders
                 .OrderByDescending(o => o.CreatedAt)
                 .Take(6)

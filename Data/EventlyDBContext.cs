@@ -6,8 +6,7 @@ namespace Evently.Data
 {
     public class EventlyDBContext : IdentityDbContext<AppUser>
     {
-        public EventlyDBContext(DbContextOptions<EventlyDBContext> options)
-            : base(options)
+        public EventlyDBContext(DbContextOptions<EventlyDBContext> options) : base(options)
         {
         }
 

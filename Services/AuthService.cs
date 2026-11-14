@@ -103,6 +103,8 @@ namespace Evently.Services
                 LastName = dto.LastName.Trim(),
                 Email = email,
                 UserName = email,
+                City = dto.City,
+                Province = dto.Province,
                 DateOfBirth = dto.DateOfBirth.Value,
                 Gender = string.IsNullOrWhiteSpace(dto.Gender) ? null : dto.Gender.Trim()
             };

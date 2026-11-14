@@ -1,9 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+
+<!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] – Evently</title>
+    <title>@ViewData["Title"] – Evently Organizer</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,127 +14,233 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="tailwind-config">
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        "on-error-container": "#ffdad6", "on-secondary": "#452b00", "surface-container-lowest": "#0c0e14",
-        "surface-variant": "#33353b", "inverse-surface": "#e2e2ea", "on-tertiary-container": "#404652",
-        "on-error": "#690005", "surface-container-low": "#191b22", "secondary-fixed": "#ffddb3",
-        "on-primary": "#432c00", "on-tertiary": "#2a313c", "on-background": "#e2e2ea", "surface-tint": "#fabc4d",
-        "on-secondary-fixed-variant": "#633f00", "tertiary-fixed": "#dde2f2", "primary": "#ffc665",
-        "secondary-fixed-dim": "#ffb952", "outline": "#9d8f7c", "tertiary-fixed-dim": "#c1c6d5", "error": "#ffb4ab",
-        "on-primary-container": "#5e4000", "inverse-on-surface": "#2e3037", "surface-bright": "#373940",
-        "on-tertiary-fixed-variant": "#414753", "surface-dim": "#111319", "on-secondary-container": "#3c2500",
-        "surface": "#111319", "on-primary-fixed": "#281900", "on-tertiary-fixed": "#161c27",
-        "outline-variant": "#504535", "secondary": "#ffb952", "surface-container-highest": "#33353b",
-        "primary-fixed-dim": "#fabc4d", "inverse-primary": "#7e5700", "background": "#111319",
-        "on-surface-variant": "#d4c4b0", "secondary-container": "#c4830e", "error-container": "#93000a",
-        "primary-container": "#e5a93c", "tertiary-container": "#aeb4c3", "on-surface": "#e2e2ea",
-        "tertiary": "#cacfde", "on-primary-fixed-variant": "#604100", "on-secondary-fixed": "#291800",
-        "surface-container": "#1d1f26", "primary-fixed": "#ffdead", "surface-container-high": "#282a30"
-      },
-      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
-      spacing: {
-        "margin-mobile": "1.25rem", "space-lg": "1.5rem", "space-xl": "2.5rem", "space-md": "1rem",
-        gutter: "1.5rem", "gutter-mobile": "1rem", margin: "3rem", "space-sm": "0.5rem", "space-xs": "0.25rem"
-      },
-      fontFamily: {
-        "headline-lg-mobile": ["Playfair Display"], "label-caps": ["Plus Jakarta Sans"],
-        "label-md": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"],
-        "display-lg-mobile": ["Playfair Display"], "headline-md": ["Playfair Display"],
-        "headline-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "display-lg": ["Playfair Display"],
-        "body-md": ["Plus Jakarta Sans"], "headline-lg": ["Playfair Display"]
-      },
-      fontSize: {
-        "headline-lg-mobile": ["28px", { lineHeight: "36px", letterSpacing: "0em", fontWeight: "600" }],
-        "label-caps": ["11px", { lineHeight: "14px", letterSpacing: "0.1em", fontWeight: "700" }],
-        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.06em", fontWeight: "600" }],
-        "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.04em", fontWeight: "600" }],
-        "body-sm": ["13px", { lineHeight: "20px", fontWeight: "400" }],
-        "display-lg-mobile": ["36px", { lineHeight: "44px", letterSpacing: "-0.01em", fontWeight: "600" }],
-        "headline-md": ["28px", { lineHeight: "36px", fontWeight: "500" }],
-        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
-        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
-        "display-lg": ["56px", { lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "600" }],
-        "body-md": ["15px", { lineHeight: "24px", fontWeight: "400" }],
-        "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.015em", fontWeight: "600" }]
-      }
-    }
-  }
-};
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-error-container": "#ffdad6", "on-secondary": "#452b00", "surface-container-lowest": "#0c0e14",
+                "surface-variant": "#33353b", "inverse-surface": "#e2e2ea", "on-tertiary-container": "#404652",
+                "on-error": "#690005", "surface-container-low": "#191b22", "secondary-fixed": "#ffddb3",
+                "on-primary": "#432c00", "on-tertiary": "#2a313c", "on-background": "#e2e2ea", "surface-tint": "#fabc4d",
+                "on-secondary-fixed-variant": "#633f00", "tertiary-fixed": "#dde2f2", "primary": "#ffc665",
+                "secondary-fixed-dim": "#ffb952", "outline": "#9d8f7c", "tertiary-fixed-dim": "#c1c6d5", "error": "#ffb4ab",
+                "on-primary-container": "#5e4000", "inverse-on-surface": "#2e3037", "surface-bright": "#373940",
+                "on-tertiary-fixed-variant": "#414753", "surface-dim": "#111319", "on-secondary-container": "#3c2500",
+                "surface": "#111319", "on-primary-fixed": "#281900", "on-tertiary-fixed": "#161c27",
+                "outline-variant": "#504535", "secondary": "#ffb952", "surface-container-highest": "#33353b",
+                "primary-fixed-dim": "#fabc4d", "inverse-primary": "#7e5700", "background": "#111319",
+                "on-surface-variant": "#d4c4b0", "secondary-container": "#c4830e", "error-container": "#93000a",
+                "primary-container": "#e5a93c", "tertiary-container": "#aeb4c3", "on-surface": "#e2e2ea",
+                "tertiary": "#cacfde", "on-primary-fixed-variant": "#604100", "on-secondary-fixed": "#291800",
+                "surface-container": "#1d1f26", "primary-fixed": "#ffdead", "surface-container-high": "#282a30"
+              },
+              borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+              spacing: {
+                "margin-mobile": "1.25rem", "space-lg": "1.5rem", "space-xl": "2.5rem", "space-md": "1rem",
+                gutter: "1.5rem", "gutter-mobile": "1rem", margin: "3rem", "space-sm": "0.5rem", "space-xs": "0.25rem"
+              },
+              fontFamily: {
+                "headline-lg-mobile": ["Playfair Display"], "label-caps": ["Plus Jakarta Sans"],
+                "label-md": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"],
+                "display-lg-mobile": ["Playfair Display"], "headline-md": ["Playfair Display"],
+                "headline-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "display-lg": ["Playfair Display"],
+                "body-md": ["Plus Jakarta Sans"], "headline-lg": ["Playfair Display"]
+              },
+              fontSize: {
+                "headline-lg-mobile": ["28px", { lineHeight: "36px", letterSpacing: "0em", fontWeight: "600" }],
+                "label-caps": ["11px", { lineHeight: "14px", letterSpacing: "0.1em", fontWeight: "700" }],
+                "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.06em", fontWeight: "600" }],
+                "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.04em", fontWeight: "600" }],
+                "body-sm": ["13px", { lineHeight: "20px", fontWeight: "400" }],
+                "display-lg-mobile": ["36px", { lineHeight: "44px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                "headline-md": ["28px", { lineHeight: "36px", fontWeight: "500" }],
+                "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                "display-lg": ["56px", { lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "600" }],
+                "body-md": ["15px", { lineHeight: "24px", fontWeight: "400" }],
+                "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.015em", fontWeight: "600" }]
+              }
+            }
+          }
+        };
     </script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        /* Force scrollbar track to always render globally across every view */
+        html {
+            overflow-y: scroll !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: #504535 #0c0e14 !important;
+        }
+        body {
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar {
+            display: block !important;
+            width: 10px !important;
+            height: 10px !important;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0e14 !important;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #504535 !important;
+            border-radius: 5px !important;
+            border: 2px solid #0c0e14 !important;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffc665 !important;
+        }
+        .sidebar-transition {
+            transition: width 0.3s ease, transform 0.3s ease, padding 0.3s ease;
+        }
+    </style>
     @await RenderSectionAsync("Head", required: false)
 </head>
-<body class="bg-surface-container-lowest font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary selection:text-on-primary">
+<body class="bg-surface-container-lowest font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary selection:text-on-primary overflow-x-hidden">
 
-    <header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-        <div class="h-16 w-full px-margin-mobile lg:px-margin flex items-center justify-between">
-            <a asp-controller="Home" asp-action="Index" class="flex items-center gap-space-sm">
-                <img alt="Evently Brand Mark" class="h-8 w-auto object-contain transition-transform duration-300 hover:scale-105"
-                     src="https://lh3.googleusercontent.com/aida/ALJJyrBBT1cHz3IFpzAbDT2K9nrI06BNUbnWRmAVuDuI9frgj_KtcPRLJPACi_GYONJtvj7uM0PA7lA4z84xiA3Mx4pwKh-OBJJOEuR5qhQBaeCVt07vxUi_ZvZOtkTyaZkHBnIWVkVrPw4NAy0_yA6mIFywJK9i1HTHIpWsJv5XkOu_Dg_1-2LoET0kmmsx6-f6aKEFCTeck-kRcHJD9k_d5FUrKnFKx38loWITEcFsKvfM" />
-                <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold">Evently</span>
-            </a>
+    @{
+        bool isAuthenticated = User.Identity?.IsAuthenticated == true;
+    }
 
-            <nav class="hidden sm:flex items-center gap-space-lg">
-                <a class="font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" href="#">Experiences</a>
-                <a class="font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" href="#">Venues</a>
-                <a class="font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" href="#">Concierge</a>
-            </nav>
-
-            <div class="flex items-center gap-space-md">
-                <div class="hidden md:flex items-center gap-space-xs text-on-surface-variant font-label-md text-label-md">
-                    <span class="material-symbols-outlined text-[16px]">public</span>
-                    <span>South Africa • EN</span>
+    @if (isAuthenticated)
+    {
+        <!-- Organizer Sidebar -->
+        <aside id="organizerSidebar" class="fixed left-0 top-0 h-screen w-72 bg-surface z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] overflow-y-auto sidebar-transition">
+            <div class="flex flex-col">
+                <div class="px-space-lg pt-space-lg pb-space-md">
+                    <div class="flex items-center gap-space-sm">
+                        <span class="font-headline-md text-headline-md text-primary tracking-tight">Evently</span>
+                        <span class="px-space-xs py-0.5 rounded-lg bg-surface-container-high text-on-surface font-label-caps text-label-caps uppercase">Organizer Portal</span>
+                    </div>
+                    <p class="font-label-caps text-label-caps uppercase text-outline mt-space-xs tracking-wider">South Africa Operations</p>
                 </div>
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                        <button type="submit" title="Sign out" aria-label="Sign out"
-                                class="w-8 h-8 rounded-full bg-primary flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
-                            <span class="material-symbols-outlined text-on-primary text-[18px]">logout</span>
-                        </button>
-                    </form>
-                }
-                else
-                {
-                    <a asp-controller="Account" asp-action="Login" title="Sign in" aria-label="Sign in"
-                       class="w-8 h-8 rounded-full bg-primary flex items-center justify-center transition-transform hover:scale-105">
-                        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
-                    </a>
-                }
+                <div class="px-space-md py-space-sm">
+                    <div class="px-space-sm py-space-xs font-label-caps text-label-caps uppercase text-outline">Workspace</div>
+                    <nav class="flex flex-col gap-1 mt-1">
+                        <a class="flex items-center gap-space-sm px-space-sm py-space-xs transition-colors bg-primary-container text-on-primary-container font-label-lg rounded-lg" asp-controller="Organizer" asp-action="Dashboard">
+                            <span class="material-symbols-outlined text-[20px]">grid_view</span><span>Overview</span>
+                        </a>
+                        <a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-colors" asp-controller="Events" asp-action="Index">
+                            <span class="material-symbols-outlined text-[20px]">festival</span><span>My Events</span>
+                        </a>
+                        <a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-colors" asp-controller="Events" asp-action="Create">
+                            <span class="material-symbols-outlined text-[20px]">add_circle</span><span>Create Event</span>
+                        </a>
+                        <a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-colors" asp-controller="Organizer" asp-action="Bookings">
+                            <span class="material-symbols-outlined text-[20px]">receipt_long</span><span>Bookings</span>
+                        </a>
+                    </nav>
+                </div>
+                <div class="px-space-md py-space-sm">
+                    <div class="px-space-sm py-space-xs font-label-caps text-label-caps uppercase text-outline">Account</div>
+                    <nav class="flex flex-col gap-1 mt-1">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                            <button type="submit" class="w-full flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-colors text-left cursor-pointer">
+                                <span class="material-symbols-outlined text-[20px]">logout</span><span>Sign Out</span>
+                            </button>
+                        </form>
+                    </nav>
+                </div>
             </div>
-        </div>
-    </header>
+            <!-- Collapse / Expand Button -->
+            <div class="p-space-md bg-surface-container-low">
+                <button id="sidebarCollapseBtn" class="w-full flex items-center justify-between px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-md text-label-md hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" type="button">
+                    <span>Collapse Menu</span>
+                    <span id="collapseIcon" class="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
+                </button>
+            </div>
+        </aside>
 
-    <main class="w-full pt-16 bg-surface-container-lowest flex-1 flex flex-col">
+        <!-- Main Header -->
+        <header id="mainHeader" class="fixed top-0 left-72 right-0 h-20 bg-surface/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)] sidebar-transition">
+            <div class="h-20 w-full px-space-lg flex items-center justify-between">
+                <div class="flex items-center gap-space-md">
+                    <div class="flex items-center gap-space-sm px-space-md py-space-xs rounded-lg bg-surface-container">
+                        <span class="material-symbols-outlined text-primary text-[20px]">theater_comedy</span>
+                        <div class="flex flex-col text-left">
+                            <span class="font-label-lg text-label-lg text-on-surface font-semibold leading-tight">Organizer Portal</span>
+                            <span class="font-label-md text-label-md text-on-surface-variant leading-none">South Africa Circuit</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-space-md">
+                    <div class="flex items-center gap-space-xs px-space-sm py-space-xs rounded-lg bg-surface-container font-label-caps text-label-caps uppercase text-primary">
+                        <span class="material-symbols-outlined text-[16px]">account_balance_wallet</span><span>ZAR (R)</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+    }
+
+    <!-- Main Body Container -->
+    <main id="mainContent" class="w-full @(isAuthenticated ? "pl-72 pt-20" : "pt-0") bg-surface-container-lowest min-h-screen px-space-lg py-space-lg flex flex-col sidebar-transition">
         @RenderBody()
     </main>
 
-    <footer class="w-full bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] py-space-md z-40">
-        <div class="w-full px-margin-mobile lg:px-margin flex flex-col md:flex-row items-center justify-between gap-space-sm font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">
+    <!-- Footer -->
+    <footer id="mainFooter" class="w-full @(isAuthenticated ? "pl-72" : "pl-0") bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] py-space-md z-40 sidebar-transition">
+        <div class="w-full px-space-lg flex flex-col md:flex-row items-center justify-between gap-space-sm font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">
             <div class="flex items-center gap-space-sm">
                 <span>© @DateTime.Now.Year Evently Ltd. All rights reserved.</span>
-                <span class="hidden md:inline">•</span>
-                <span class="hidden md:inline">Cape Town • Johannesburg • Durban</span>
             </div>
             <div class="flex items-center gap-space-md">
                 <div class="flex items-center gap-space-xs text-secondary">
                     <span class="material-symbols-outlined text-[15px]">lock</span>
                     <span>256-bit encrypted ticketing</span>
                 </div>
-                <div class="flex items-center gap-space-md">
-                    <a class="hover:text-on-surface transition-colors" href="#">Terms</a>
-                    <a class="hover:text-on-surface transition-colors" href="#">Privacy</a>
-                    <a class="hover:text-on-surface transition-colors" href="#">Help</a>
-                </div>
             </div>
         </div>
     </footer>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @if (isAuthenticated)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const sidebar = document.getElementById("organizerSidebar");
+                const header = document.getElementById("mainHeader");
+                const content = document.getElementById("mainContent");
+                const footer = document.getElementById("mainFooter");
+                const collapseBtn = document.getElementById("sidebarCollapseBtn");
+                const collapseIcon = document.getElementById("collapseIcon");
+                const collapseText = collapseBtn.querySelector("span:first-child");
+
+                let isCollapsed = false;
+
+                collapseBtn.addEventListener("click", function () {
+                    isCollapsed = !isCollapsed;
+                    if (isCollapsed) {
+                        sidebar.style.width = "80px";
+                        header.style.left = "80px";
+                        content.style.paddingLeft = "80px";
+                        footer.style.paddingLeft = "80px";
+                        collapseText.style.display = "none";
+                        collapseIcon.textContent = "keyboard_double_arrow_right";
+                        
+                        sidebar.querySelectorAll("aside nav a span:last-child, aside .px-space-lg p, aside .px-space-sm div, aside .p-space-md span:not(.material-symbols-outlined)").forEach(el => {
+                            el.style.display = "none";
+                        });
+                    } else {
+                        sidebar.style.width = "288px";
+                        header.style.left = "288px";
+                        content.style.paddingLeft = "288px";
+                        footer.style.paddingLeft = "288px";
+                        collapseText.style.display = "inline";
+                        collapseIcon.textContent = "keyboard_double_arrow_left";
+
+                        sidebar.querySelectorAll("aside nav a span:last-child, aside .px-space-lg p, aside .px-space-sm div, aside .p-space-md span:not(.material-symbols-outlined)").forEach(el => {
+                            el.style.display = "";
+                        });
+                    }
+                });
+            });
+        </script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

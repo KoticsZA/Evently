@@ -1,0 +1,42 @@
+﻿@using Evently.Constants
+@model Evently.ViewModels.Auth.RegisterViewModel
+@{
+    const string inputBase = "w-full bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline/70 px-4 py-3 rounded-lg border border-transparent focus:outline-none focus:bg-surface-container focus:border-primary/60 focus:text-on-surface transition-all shadow-sm";
+    var cities = SouthAfricaLocations.CitiesFor(Model.Province);
+}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+    <div class="flex flex-col gap-1.5">
+        <label asp-for="Province" class="font-label-md text-label-md text-on-surface">Province <span class="text-primary">*</span></label>
+        <div class="relative flex items-center">
+            <select asp-for="Province" data-province-select autocomplete="address-level1"
+                    class="@inputBase appearance-none cursor-pointer pr-10 [color-scheme:dark]">
+                <option value="">Select a province</option>
+                @foreach (var p in SouthAfricaLocations.Provinces)
+                {
+                    <option value="@p" selected="@(string.Equals(Model.Province, p, StringComparison.OrdinalIgnoreCase))">@p</option>
+                }
+            </select>
+            <span class="material-symbols-outlined absolute right-3 text-[20px] text-outline pointer-events-none">expand_more</span>
+        </div>
+        <span asp-validation-for="Province" class="text-error font-label-md text-label-md"></span>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+        <label asp-for="City" class="font-label-md text-label-md text-on-surface">City <span class="text-primary">*</span></label>
+        <div class="relative flex items-center">
+            <select asp-for="City" data-city-select autocomplete="address-level2" disabled="@(cities.Count == 0)"
+                    class="@inputBase appearance-none cursor-pointer pr-10 disabled:opacity-60 disabled:cursor-not-allowed [color-scheme:dark]">
+                <option value="">@(cities.Count == 0 ? "Select a province first" : "Select a city")</option>
+                @foreach (var c in cities)
+                {
+                    <option value="@c" selected="@(string.Equals(Model.City, c, StringComparison.OrdinalIgnoreCase))">@c</option>
+                }
+            </select>
+            <span class="material-symbols-outlined absolute right-3 text-[20px] text-outline pointer-events-none">expand_more</span>
+        </div>
+        <span asp-validation-for="City" class="text-error font-label-md text-label-md"></span>
+    </div>
+</div>
+
+<script id="cityData" type="application/json">@Json.Serialize(SouthAfricaLocations.CitiesByProvince)</script>

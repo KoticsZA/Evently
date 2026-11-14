@@ -8,5 +8,6 @@ namespace Evently.Interfaces
     {
         Task<EventDiscoveryDto> GetEventsAsync(string userId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<CategoryOptionDto>> GetCategoriesAsync(CancellationToken cancellationToken = default);
+        Task<int> CreateEventAsync(CreateEventDto dto, string userId, CancellationToken cancellationToken = default);
     }
 }

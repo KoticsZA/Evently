@@ -1,4 +1,5 @@
-﻿@model Evently.ViewModels.Auth.RegisterViewModel
+﻿@using Evently.Constants
+@model Evently.ViewModels.Auth.RegisterViewModel
 @{
     ViewData["Title"] = "Create account";
     const string inputBase = "w-full bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline/70 px-4 py-3 rounded-lg border border-transparent focus:outline-none focus:bg-surface-container focus:border-primary/60 focus:text-on-surface transition-all shadow-sm";
@@ -132,6 +133,72 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Province / City (data comes from Evently.Constants.SouthAfricaLocations) -->
+                @{
+                    var selectedCities = SouthAfricaLocations.CitiesFor(Model?.Province);
+                }
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="Province" class="font-label-md text-label-md text-on-surface">Province <span class="text-primary">*</span></label>
+                        <div class="relative flex items-center">
+                            <select asp-for="Province" id="Province" autocomplete="off"
+                                    class="@inputBase appearance-none cursor-pointer pr-10 [color-scheme:dark]">
+                                <option value="">Select a province</option>
+                                @foreach (var p in SouthAfricaLocations.Provinces)
+                                {
+                                    <option value="@p" selected="@(Model?.Province == p)">@p</option>
+                                }
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 text-[20px] text-outline pointer-events-none">expand_more</span>
+                        </div>
+                        <span asp-validation-for="Province" class="text-error font-label-md text-label-md"></span>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label asp-for="City" class="font-label-md text-label-md text-on-surface">City <span class="text-primary">*</span></label>
+                        <div class="relative flex items-center">
+                            <select asp-for="City" id="City" autocomplete="off" disabled="@(selectedCities.Count == 0)"
+                                    class="@inputBase appearance-none cursor-pointer pr-10 disabled:opacity-60 disabled:cursor-not-allowed [color-scheme:dark]">
+                                <option value="">@(selectedCities.Count == 0 ? "Select a province first" : "Select a city")</option>
+                                @foreach (var c in selectedCities)
+                                {
+                                    <option value="@c" selected="@(Model?.City == c)">@c</option>
+                                }
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 text-[20px] text-outline pointer-events-none">expand_more</span>
+                        </div>
+                        <span asp-validation-for="City" class="text-error font-label-md text-label-md"></span>
+                    </div>
+                </div>
+
+                <script>
+                    (function () {
+                        var cities = @Json.Serialize(SouthAfricaLocations.CitiesByProvince);
+                        var province = document.getElementById('Province');
+                        var city = document.getElementById('City');
+                        if (!province || !city) return;
+
+                        function fill(keep) {
+                            var list = cities[province.value] || [];
+                            var current = keep ? city.value : '';
+                            city.innerHTML = '<option value="">' + (province.value ? 'Select a city' : 'Select a province first') + '</option>';
+                            list.forEach(function (name) {
+                                var o = document.createElement('option');
+                                o.value = name;
+                                o.textContent = name;
+                                if (name === current) o.selected = true;
+                                city.appendChild(o);
+                            });
+                            city.disabled = list.length === 0;
+                        }
+
+                        province.addEventListener('change', function () { fill(false); });
+                        window.addEventListener('load', function () { fill(true); });                       // browser may restore the old province after load
+                        window.addEventListener('pageshow', function (e) { if (e.persisted) fill(true); }); // back/forward cache
+                        fill(true);
+                    })();
+                </script>
 
                 <!-- Passwords -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">

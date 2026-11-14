@@ -20,7 +20,7 @@ namespace Evently.Controllers
         [AllowAnonymous]
         public IActionResult Register()
         {
-            return View();
+            return View(new RegisterViewModel());
         }
 
         [HttpPost]
@@ -36,6 +36,8 @@ namespace Evently.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Email = model.Email,
+                City = model.City,
+                Province = model.Province,
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender,
                 Password = model.Password,

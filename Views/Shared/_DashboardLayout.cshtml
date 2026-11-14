@@ -1,235 +1,245 @@
 ﻿@using System.Security.Claims
-@{
-    var firstName = ViewData["FirstName"] as string;
-    var displayName = !string.IsNullOrWhiteSpace(firstName) ? firstName : (User.Identity?.Name ?? "Guest");
-    var active = ViewData["ActiveNav"] as string ?? "";
-    var ticketBadge = ViewData["TicketBadge"] as int? ?? 0;
 
-    var primaryNav = new[]
-    {
-        (Key: "overview", Icon: "space_dashboard",       Label: "Overview",        Href: Url.Action("Dashboard", "Dashboard") ?? "#"),
-        (Key: "discover", Icon: "explore",               Label: "Discover events", Href: Url.Action("Index", "Events") ?? "#"),
-        (Key: "tickets",  Icon: "confirmation_number",   Label: "My tickets",      Href: Url.Action("Index", "Bookings") ?? "#"),
-        (Key: "bookings", Icon: "event_seat",            Label: "My bookings",     Href: Url.Action("Index", "Bookings") ?? "#"),
-        (Key: "saved",    Icon: "bookmark_border",       Label: "Saved events",    Href: Url.Action("Saved", "Events") ?? "#")
-    };
-    var accountNav = new[]
-    {
-        (Key: "profile",       Icon: "person_outline",      Label: "My profile",    Href: Url.Action("Profile", "Account") ?? "#"),
-        (Key: "notifications", Icon: "notifications_none",  Label: "Notifications", Href: "#"),
-        (Key: "settings",      Icon: "tune",                Label: "Settings",      Href: "#")
-    };
-    const string activeCls = "bg-surface-container text-[#faf9fd] font-semibold border-l-2 border-secondary";
-    const string idleCls = "text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low hover:text-[#faf9fd]";
-}
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] – Evently</title>
+    <title>@ViewData["Title"] – Evently Organizer</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="tailwind-config">
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        "on-primary-fixed-variant": "#604100", "tertiary-fixed-dim": "#c1c6d5", "on-background": "#e2e2ea",
-        "surface-bright": "#373940", "primary": "#ffc665", "on-primary-fixed": "#281900",
-        "secondary-fixed-dim": "#ffb952", "on-secondary": "#452b00", "outline": "#9d8f7c", "surface": "#111319",
-        "surface-container-highest": "#33353b", "on-tertiary": "#2a313c", "surface-variant": "#33353b",
-        "outline-variant": "#2a2d37", "surface-container-lowest": "#0c0e14", "error-container": "#93000a",
-        "secondary-container": "#e5a93c", "tertiary-fixed": "#dde2f2", "inverse-surface": "#e2e2ea",
-        "on-primary": "#432c00", "on-surface": "#e2e2ea", "tertiary": "#cacfde", "surface-dim": "#111319",
-        "on-primary-container": "#5e4000", "surface-container-high": "#282a30", "primary-fixed-dim": "#fabc4d",
-        "on-error-container": "#ffdad6", "surface-container-low": "#191b22", "surface-tint": "#fabc4d",
-        "background": "#111319", "tertiary-container": "#aeb4c3", "secondary": "#e5a93c", "on-error": "#690005",
-        "on-secondary-fixed-variant": "#633f00", "inverse-primary": "#7e5700", "primary-container": "#e5a93c",
-        "on-secondary-container": "#0c0e14", "on-secondary-fixed": "#291800", "on-tertiary-fixed-variant": "#414753",
-        "on-surface-variant": "#8e92a4", "surface-container": "#1d1f26", "on-tertiary-fixed": "#161c27",
-        "secondary-fixed": "#ffddb3", "primary-fixed": "#ffdead", "error": "#ffb4ab", "on-tertiary-container": "#404652"
-      },
-      borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
-      spacing: {
-        "margin": "3rem", "margin-tablet": "2rem", "gutter-mobile": "1rem", "space-md": "1rem", "space-sm": "0.5rem",
-        "gutter": "1.5rem", "space-lg": "1.5rem", "space-xl": "2.5rem", "space-xs": "0.25rem", "margin-mobile": "1.25rem"
-      },
-      fontFamily: {
-        "label-lg": ["Plus Jakarta Sans"], "display-lg": ["Playfair Display"], "headline-md": ["Playfair Display"],
-        "headline-lg": ["Playfair Display"], "label-md": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"],
-        "body-sm": ["Plus Jakarta Sans"], "title-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"],
-        "headline-lg-mobile": ["Playfair Display"], "display-lg-mobile": ["Playfair Display"],
-        "headline-sm": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "title-md": ["Plus Jakarta Sans"]
-      },
-      fontSize: {
-        "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.04em", fontWeight: "600" }],
-        "display-lg": ["56px", { lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "600" }],
-        "headline-md": ["28px", { lineHeight: "36px", fontWeight: "500" }],
-        "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.015em", fontWeight: "600" }],
-        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.06em", fontWeight: "600" }],
-        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
-        "body-sm": ["13px", { lineHeight: "20px", fontWeight: "400" }],
-        "title-lg": ["18px", { lineHeight: "26px", letterSpacing: "-0.01em", fontWeight: "600" }],
-        "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.1em", fontWeight: "700" }],
-        "headline-lg-mobile": ["28px", { lineHeight: "36px", letterSpacing: "0em", fontWeight: "600" }],
-        "display-lg-mobile": ["36px", { lineHeight: "44px", letterSpacing: "-0.01em", fontWeight: "600" }],
-        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
-        "body-md": ["15px", { lineHeight: "24px", fontWeight: "400" }],
-        "title-md": ["16px", { lineHeight: "24px", fontWeight: "600" }]
-      }
-    }
-  }
-};
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-error-container": "#ffdad6", "on-secondary": "#452b00", "surface-container-lowest": "#0c0e14",
+                "surface-variant": "#33353b", "inverse-surface": "#e2e2ea", "on-tertiary-container": "#404652",
+                "on-error": "#690005", "surface-container-low": "#191b22", "secondary-fixed": "#ffddb3",
+                "on-primary": "#432c00", "on-tertiary": "#2a313c", "on-background": "#e2e2ea", "surface-tint": "#fabc4d",
+                "on-secondary-fixed-variant": "#633f00", "tertiary-fixed": "#dde2f2", "primary": "#ffc665",
+                "secondary-fixed-dim": "#ffb952", "outline": "#9d8f7c", "tertiary-fixed-dim": "#c1c6d5", "error": "#ffb4ab",
+                "on-primary-container": "#5e4000", "inverse-on-surface": "#2e3037", "surface-bright": "#373940",
+                "on-tertiary-fixed-variant": "#414753", "surface-dim": "#111319", "on-secondary-container": "#3c2500",
+                "surface": "#111319", "on-primary-fixed": "#281900", "on-tertiary-fixed": "#161c27",
+                "outline-variant": "#504535", "secondary": "#ffb952", "surface-container-highest": "#33353b",
+                "primary-fixed-dim": "#fabc4d", "inverse-primary": "#7e5700", "background": "#111319",
+                "on-surface-variant": "#d4c4b0", "secondary-container": "#c4830e", "error-container": "#93000a",
+                "primary-container": "#e5a93c", "tertiary-container": "#aeb4c3", "on-surface": "#e2e2ea",
+                "tertiary": "#cacfde", "on-primary-fixed-variant": "#604100", "on-secondary-fixed": "#291800",
+                "surface-container": "#1d1f26", "primary-fixed": "#ffdead", "surface-container-high": "#282a30"
+              },
+              borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+              spacing: {
+                "margin-mobile": "1.25rem", "space-lg": "1.5rem", "space-xl": "2.5rem", "space-md": "1rem",
+                gutter: "1.5rem", "gutter-mobile": "1rem", margin: "3rem", "space-sm": "0.5rem", "space-xs": "0.25rem"
+              },
+              fontFamily: {
+                "headline-lg-mobile": ["Playfair Display"], "label-caps": ["Plus Jakarta Sans"],
+                "label-md": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"],
+                "display-lg-mobile": ["Playfair Display"], "headline-md": ["Playfair Display"],
+                "headline-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "display-lg": ["Playfair Display"],
+                "body-md": ["Plus Jakarta Sans"], "headline-lg": ["Playfair Display"]
+              },
+              fontSize: {
+                "headline-lg-mobile": ["28px", { lineHeight: "36px", letterSpacing: "0em", fontWeight: "600" }],
+                "label-caps": ["11px", { lineHeight: "14px", letterSpacing: "0.1em", fontWeight: "700" }],
+                "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.06em", fontWeight: "600" }],
+                "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.04em", fontWeight: "600" }],
+                "body-sm": ["13px", { lineHeight: "20px", fontWeight: "400" }],
+                "display-lg-mobile": ["36px", { lineHeight: "44px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                "headline-md": ["28px", { lineHeight: "36px", fontWeight: "500" }],
+                "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                "display-lg": ["56px", { lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "600" }],
+                "body-md": ["15px", { lineHeight: "24px", fontWeight: "400" }],
+                "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.015em", fontWeight: "600" }]
+              }
+            }
+          }
+        };
     </script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
-        html, body { margin: 0; padding: 0; }
-        body { overscroll-behavior: none; }
-        ::-webkit-scrollbar { display: none; }
-        .qr-box img { width: 100%; height: 100%; image-rendering: pixelated; }
+        /* Force persistent scrollbar track across every view */
+        html {
+            overflow-y: scroll !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: #504535 #0c0e14 !important;
+        }
+        body {
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar {
+            display: block !important;
+            width: 10px !important;
+            height: 10px !important;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0e14 !important;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #504535 !important;
+            border-radius: 5px !important;
+            border: 2px solid #0c0e14 !important;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffc665 !important;
+        }
+        .sidebar-transition {
+            transition: width 0.3s ease, transform 0.3s ease, padding 0.3s ease;
+        }
     </style>
     @await RenderSectionAsync("Head", required: false)
 </head>
-<body class="bg-surface font-body-md text-on-surface antialiased">
+<body class="bg-surface-container-lowest font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary selection:text-on-primary overflow-x-hidden">
 
-    <!-- Antiforgery token for fetch() calls (save/unsave) -->
-    <form id="antiForgery" class="hidden">@Html.AntiForgeryToken()</form>
+    @{
+        bool isAuthenticated = User.Identity?.IsAuthenticated == true;
+    }
 
-    <div id="sidebarOverlay" class="hidden fixed inset-0 bg-black/60 z-40 lg:hidden"></div>
-
-    <aside id="sidebar"
-           class="fixed left-0 top-0 h-full w-[260px] bg-surface-container-lowest border-r border-[#222530] flex flex-col justify-between z-50 shadow-[4px_0_24px_rgba(0,0,0,0.4)] -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
-        <div class="flex flex-col">
-            <div class="h-20 px-space-lg flex items-center justify-between border-b border-[#222530]/60">
-                <a asp-controller="Home" asp-action="Index" class="flex items-baseline gap-space-xs">
-                    <span class="font-headline-md text-headline-md tracking-tight text-[#faf9fd]">Evently</span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                </a>
-                <span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-secondary tracking-widest uppercase border border-secondary/30">Attendee</span>
-            </div>
-
-            <nav class="flex flex-col gap-1 px-space-sm pt-space-md" aria-label="Primary">
-                @foreach (var item in primaryNav)
-                {
-                    var isActive = item.Key == active;
-                    <a href="@item.Href" aria-current="@(isActive ? "page" : null)"
-                       class="group flex items-center justify-between px-space-md py-2.5 rounded transition-colors @(isActive ? activeCls : idleCls)">
-                        <span class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[20px] @(isActive ? "text-secondary" : "")">@item.Icon</span>
-                            <span>@item.Label</span>
-                        </span>
-                        @if (item.Key == "tickets" && ticketBadge > 0)
-                        {
-                            <span class="px-2 py-0.5 rounded-full bg-secondary text-[#0c0e14] font-label-sm text-label-sm font-bold">@ticketBadge</span>
-                        }
-                    </a>
-                }
-            </nav>
-
-            <div class="px-space-md pt-space-lg pb-space-xs">
-                <span class="font-label-sm text-label-sm uppercase tracking-wider text-[#63687b]">Account &amp; System</span>
-            </div>
-
-            <nav class="flex flex-col gap-1 px-space-sm" aria-label="Account">
-                @foreach (var item in accountNav)
-                {
-                    var isActive = item.Key == active;
-                    <a href="@item.Href" aria-current="@(isActive ? "page" : null)"
-                       class="group flex items-center px-space-md py-2.5 rounded transition-colors @(isActive ? activeCls : idleCls)">
-                        <span class="material-symbols-outlined text-[20px] mr-3">@item.Icon</span>
-                        <span>@item.Label</span>
-                    </a>
-                }
-                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                    <button type="submit"
-                            class="w-full group flex items-center px-space-md py-2.5 rounded transition-colors text-left cursor-pointer @idleCls">
-                        <span class="material-symbols-outlined text-[20px] mr-3">logout</span>
-                        <span>Sign out</span>
-                    </button>
-                </form>
-            </nav>
-        </div>
-
-        <div class="p-space-md m-space-sm rounded-xl bg-surface-container-low border border-[#222530] shadow-md">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-[#0c0e14] text-[18px] font-bold">person</span>
-                </div>
-                <div class="flex flex-col min-w-0 flex-1">
-                    <span class="font-title-md text-title-md text-[#faf9fd] truncate">@displayName</span>
-                    <div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
-                        <span class="material-symbols-outlined text-[14px] text-secondary">near_me</span>
-                        <span class="truncate">South Africa</span>
+    @if (isAuthenticated)
+    {
+        <!-- Organizer Sidebar -->
+        <aside id="organizerSidebar" class="fixed left-0 top-0 h-screen w-72 bg-surface z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] overflow-y-auto sidebar-transition">
+            <div class="flex flex-col">
+                <div class="px-space-lg pt-space-lg pb-space-md">
+                    <div class="flex items-center gap-space-sm">
+                        <span class="font-headline-md text-headline-md text-primary tracking-tight">Evently</span>
+                        <span class="px-space-xs py-0.5 rounded-lg bg-surface-container-high text-on-surface font-label-caps text-label-caps uppercase">Organizer Portal</span>
                     </div>
+                    <p class="font-label-caps text-label-caps uppercase text-outline mt-space-xs tracking-wider">South Africa Operations</p>
+                </div>
+                <div class="px-space-md py-space-sm">
+                    <div class="px-space-sm py-space-xs font-label-caps text-label-caps uppercase text-outline">Workspace</div>
+                    <nav class="flex flex-col gap-1 mt-1">
+                        <a class="flex items-center gap-space-sm px-space-sm py-space-xs transition-colors bg-primary-container text-on-primary-container font-label-lg rounded-lg" asp-controller="Organizer" asp-action="Dashboard">
+                            <span class="material-symbols-outlined text-[20px]">grid_view</span><span>Overview</span>
+                        </a>
+                        <a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-colors" asp-controller="Events" asp-action="Index">
+                            <span class="material-symbols-outlined text-[20px]">festival</span><span>My Events</span>
+                        </a>
+                        <a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-colors" asp-controller="Events" asp-action="Create">
+                            <span class="material-symbols-outlined text-[20px]">add_circle</span><span>Create Event</span>
+                        </a>
+                        <a class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-colors" asp-controller="Organizer" asp-action="Bookings">
+                            <span class="material-symbols-outlined text-[20px]">receipt_long</span><span>Bookings</span>
+                        </a>
+                    </nav>
+                </div>
+                <div class="px-space-md py-space-sm">
+                    <div class="px-space-sm py-space-xs font-label-caps text-label-caps uppercase text-outline">Account</div>
+                    <nav class="flex flex-col gap-1 mt-1">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                            <button type="submit" class="w-full flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-colors text-left cursor-pointer">
+                                <span class="material-symbols-outlined text-[20px]">logout</span><span>Sign Out</span>
+                            </button>
+                        </form>
+                    </nav>
                 </div>
             </div>
-        </div>
-    </aside>
+            <div class="p-space-md bg-surface-container-low">
+                <button id="sidebarCollapseBtn" class="w-full flex items-center justify-between px-space-sm py-space-xs rounded-lg text-on-surface-variant font-label-md text-label-md hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" type="button">
+                    <span>Collapse Menu</span>
+                    <span id="collapseIcon" class="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
+                </button>
+            </div>
+        </aside>
 
-    <div class="lg:pl-[260px] min-h-screen flex flex-col justify-between">
-        <header class="fixed top-0 left-0 lg:left-[260px] right-0 h-20 bg-surface-container-lowest/90 backdrop-blur-xl z-30 border-b border-[#222530] shadow-sm">
-            <div class="h-20 w-full px-space-md lg:px-space-lg flex items-center justify-between gap-space-md">
+        <!-- Main Header -->
+        <header id="mainHeader" class="fixed top-0 left-72 right-0 h-20 bg-surface/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)] sidebar-transition">
+            <div class="h-20 w-full px-space-lg flex items-center justify-between">
                 <div class="flex items-center gap-space-md">
-                    <button id="sidebarToggle" type="button" aria-label="Open menu" aria-controls="sidebar"
-                            class="lg:hidden p-2 rounded-full hover:bg-surface-container text-[#faf9fd] transition-colors">
-                        <span class="material-symbols-outlined text-[22px]">menu</span>
-                    </button>
-                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low border border-[#222530] text-[#faf9fd] font-body-sm text-body-sm">
-                        <span class="material-symbols-outlined text-[16px] text-secondary">location_on</span>
-                        <span>Western Cape • Cape Town</span>
-                    </div>
-                    <div class="hidden xl:flex items-center text-on-surface-variant font-body-sm text-body-sm gap-2">
-                        <span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
-                        <span class="tracking-wide">Concierge Active</span>
+                    <div class="flex items-center gap-space-sm px-space-md py-space-xs rounded-lg bg-surface-container">
+                        <span class="material-symbols-outlined text-primary text-[20px]">theater_comedy</span>
+                        <div class="flex flex-col text-left">
+                            <span class="font-label-lg text-label-lg text-on-surface font-semibold leading-tight">Organizer Portal</span>
+                            <span class="font-label-md text-label-md text-on-surface-variant leading-none">South Africa Circuit</span>
+                        </div>
                     </div>
                 </div>
-
-                <div class="flex items-center gap-space-sm sm:gap-space-md">
-                    <button type="button" data-focus="#eventSearch"
-                            class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-low border border-[#222530] text-on-surface-variant font-body-sm text-body-sm hover:text-[#faf9fd] hover:bg-surface-container transition-colors">
-                        <span class="material-symbols-outlined text-[18px] text-secondary">search</span>
-                        <span class="hidden sm:inline">Search curations</span>
-                    </button>
-                    <a href="#" class="flex items-center gap-1.5 px-3 py-1.5 rounded text-on-surface-variant hover:text-[#faf9fd] font-body-sm text-body-sm transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">help_outline</span>
-                        <span class="hidden md:inline">Assistance</span>
-                    </a>
-                    <div class="w-8 h-8 rounded-full bg-secondary text-[#0c0e14] font-bold flex items-center justify-center" title="@displayName">
-                        <span class="material-symbols-outlined text-[18px]">person</span>
+                <div class="flex items-center gap-space-md">
+                    <div class="flex items-center gap-space-xs px-space-sm py-space-xs rounded-lg bg-surface-container font-label-caps text-label-caps uppercase text-primary">
+                        <span class="material-symbols-outlined text-[16px]">account_balance_wallet</span><span>ZAR (R)</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
                     </div>
                 </div>
             </div>
         </header>
+    }
 
-        <main class="w-full pt-20 bg-surface flex-1">
-            @RenderBody()
-        </main>
+    <!-- Main Body Container -->
+    <main id="mainContent" class="w-full @(isAuthenticated ? "pl-72 pt-20" : "pt-0") bg-surface-container-lowest min-h-screen px-space-lg py-space-lg flex flex-col sidebar-transition">
+        @RenderBody()
+    </main>
 
-        <footer class="w-full bg-surface-container-lowest border-t border-[#222530] py-space-md">
-            <div class="w-full px-space-md lg:px-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
-                <div class="flex items-center gap-1 flex-wrap justify-center">
-                    <span class="font-headline-sm text-headline-sm text-[#faf9fd]">Evently</span>
-                    <span class="mx-2 text-secondary">•</span>
-                    <span>Exclusive cultural, arts &amp; dining access across South Africa</span>
-                </div>
-                <div class="flex items-center gap-space-lg flex-wrap justify-center">
-                    <a class="text-[#8e92a4] hover:text-[#faf9fd] transition-colors" href="#">Privacy Policy</a>
-                    <a class="text-[#8e92a4] hover:text-[#faf9fd] transition-colors" href="#">Patron Terms</a>
-                    <a class="text-[#8e92a4] hover:text-[#faf9fd] transition-colors" href="#">Concierge Desk</a>
-                    <span class="text-[#63687b]">© @DateTime.Now.Year Evently (Pty) Ltd.</span>
+    <!-- Footer -->
+    <footer id="mainFooter" class="w-full @(isAuthenticated ? "pl-72" : "pl-0") bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] py-space-md z-40 sidebar-transition">
+        <div class="w-full px-space-lg flex flex-col md:flex-row items-center justify-between gap-space-sm font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">
+            <div class="flex items-center gap-space-sm">
+                <span>© @DateTime.Now.Year Evently Ltd. All rights reserved.</span>
+            </div>
+            <div class="flex items-center gap-space-md">
+                <div class="flex items-center gap-space-xs text-secondary">
+                    <span class="material-symbols-outlined text-[15px]">lock</span>
+                    <span>256-bit encrypted ticketing</span>
                 </div>
             </div>
-        </footer>
-    </div>
+        </div>
+    </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @if (isAuthenticated)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const sidebar = document.getElementById("organizerSidebar");
+                const header = document.getElementById("mainHeader");
+                const content = document.getElementById("mainContent");
+                const footer = document.getElementById("mainFooter");
+                const collapseBtn = document.getElementById("sidebarCollapseBtn");
+                const collapseIcon = document.getElementById("collapseIcon");
+                const collapseText = collapseBtn.querySelector("span:first-child");
+
+                let isCollapsed = false;
+
+                collapseBtn.addEventListener("click", function () {
+                    isCollapsed = !isCollapsed;
+                    if (isCollapsed) {
+                        sidebar.style.width = "80px";
+                        header.style.left = "80px";
+                        content.style.paddingLeft = "80px";
+                        footer.style.paddingLeft = "80px";
+                        collapseText.style.display = "none";
+                        collapseIcon.textContent = "keyboard_double_arrow_right";
+                        
+                        sidebar.querySelectorAll("aside nav a span:last-child, aside .px-space-lg p, aside .px-space-sm div, aside .p-space-md span:not(.material-symbols-outlined)").forEach(el => {
+                            el.style.display = "none";
+                        });
+                    } else {
+                        sidebar.style.width = "288px";
+                        header.style.left = "288px";
+                        content.style.paddingLeft = "288px";
+                        footer.style.paddingLeft = "288px";
+                        collapseText.style.display = "inline";
+                        collapseIcon.textContent = "keyboard_double_arrow_left";
+
+                        sidebar.querySelectorAll("aside nav a span:last-child, aside .px-space-lg p, aside .px-space-sm div, aside .p-space-md span:not(.material-symbols-outlined)").forEach(el => {
+                            el.style.display = "";
+                        });
+                    }
+                });
+            });
+        </script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
